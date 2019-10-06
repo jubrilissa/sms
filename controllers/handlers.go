@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/jubrilissa/sms-webapp/models"
+	"sms-webapp/models"
 )
 
 const (
