@@ -10,8 +10,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
 	"sms-webapp/models"
+
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -172,15 +173,38 @@ func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ViewAllSubjectHandler(w http.ResponseWriter, r *http.Request) {
-	files := []string{
-		filepath.Join(templatesDir, "all-subjects.html"),
-		filepath.Join(templatesDir, "base.html"),
+	fmt.Println("method: ", r.Method)
+	if r.Method == "GET" {
+
+		files := []string{
+			filepath.Join(templatesDir, "all-subjects.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		tmpl := template.Must(template.
+			ParseFiles(files...))
+
+		tmpl.Execute(w, nil)
+	} else {
+		fmt.Println("Got to the else part of viewing subjects")
+		r.ParseMultipartForm(32 << 20)
+		name := r.FormValue("subjectName")
+		// class := r.FormValue("class")
+		class := r.Form["class"]
+		fmt.Println("The name is ", name)
+		fmt.Println("The class is ", class)
+
+		for _, singleClass := range class {
+			subjectClass := &models.SubjectClass{}
+			subjectClass.Class = singleClass
+			subjectClass.Subject = name
+			subjectClass.IsCompulsory = false
+			subjectClass.Create()
+		}
+
+		http.Redirect(w, r, "/subjects", http.StatusFound)
+
 	}
-
-	tmpl := template.Must(template.
-		ParseFiles(files...))
-
-	tmpl.Execute(w, nil)
 }
 
 func ViewAllClassHandler(w http.ResponseWriter, r *http.Request) {
@@ -310,15 +334,20 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddSubjectHandler(w http.ResponseWriter, r *http.Request) {
-	files := []string{
-		filepath.Join(templatesDir, "add-subject.html"),
-		filepath.Join(templatesDir, "base.html"),
+	fmt.Println("method:", r.Method)
+
+	if r.Method == "GET" {
+		files := []string{
+			filepath.Join(templatesDir, "add-subject.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		tmpl := template.Must(template.
+			ParseFiles(files...))
+
+		tmpl.Execute(w, nil)
 	}
 
-	tmpl := template.Must(template.
-		ParseFiles(files...))
-
-	tmpl.Execute(w, nil)
 }
 
 func AddTeacherHandler(w http.ResponseWriter, r *http.Request) {

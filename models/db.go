@@ -37,7 +37,7 @@ func init() {
 	db = conn
 	// defer db.Close()
 
-	db.Debug().AutoMigrate(&Student{}, &Class{})
+	db.Debug().AutoMigrate(&Student{}, &Class{}, &SubjectClass{})
 	// db.Create(&Student{Name: "isere", Address: "Test addres", PhoneNo: "08034246506", Religion: "Tester"})
 }
 
