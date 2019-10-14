@@ -864,12 +864,13 @@
                                 <div class="student-inner-std res-mg-b-30">
                                     <div class="student-img">
                                         <!-- <img src="img/student/{{$index}}.jpg" alt="" /> -->
-                                        <img src="img/student/{{.Image}}" alt="" />
+                                        <!-- <img src="img/student/{{.Image}}" alt="" /> -->
                                     </div>
                                     <div class="student-dtl">
                                         <h2>{{.Name}}</h2>
                                         <p class="dp">{{.Class}}</p>
                                         <p class="dp-ag"><b>Age:</b> {{.DateOfBirth}}</p>
+                                        <p class="dp-ag"><a href="/student-profile/{{.ID}}">View Student</a></p>
                                     </div>
                                 </div>
                             </div>
