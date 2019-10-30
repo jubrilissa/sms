@@ -866,19 +866,19 @@
                                                         <div class="row">
                                                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                 <div class="form-group">
-                                                                    <input name="fullName" type="text" class="form-control" placeholder="Full Name">
+                                                                    <input name="fullName" type="text" class="form-control" placeholder="Full Name" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <input name="address" type="text" class="form-control" placeholder="Address">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <input name="phoneNo" type="tel" class="form-control" placeholder="Phone no.">
+                                                                    <input name="phoneNo" type="number" class="form-control" placeholder="Phone no." required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <input name="dateOfBirth" id="finish" type="date" class="form-control" placeholder="Date of Birth">
                                                                 </div>                                                                
                                                                 <div class="form-group">
-                                                                        <input name="image" id="finish" type="file" class="form-control" placeholder="Student Picture">
+                                                                        <input name="image" id="finish" type="file" class="form-control" placeholder="Student Picture" required>
                                                                 </div>
 
                                                                 <!-- TODO: Use the dropzone or investigate why the dropzoene isn't working -->
@@ -900,7 +900,7 @@
                                                                     <textarea name="description" placeholder="Description"></textarea>
                                                                 </div> -->
                                                                 <div class="form-group">
-                                                                    <select name="gender" class="form-control">
+                                                                    <select name="gender" class="form-control" required>
 																		<option value="none" selected="" disabled="">Select Gender</option>
 																		<option value="MALE">Male</option>
 																		<option value="FEMALE">Female</option>
@@ -915,14 +915,14 @@
 																		</select>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <select name="class" class="form-control">
+                                                                    <select name="class" class="form-control" required>
 																			<option value="none" selected="" disabled="">Select Class</option>
-																			<option value="jss1">JSS 1</option>
-																			<option value="jss2">JSS 2</option>
-																			<option value="jss3">JSS 3</option>
-																			<option value="sss1">SSS 1</option>
-																			<option value="sss2">SSS 2</option>
-																			<option value="sss3">SSS 3</option>
+																			<option value="JSS1">JSS 1</option>
+																			<option value="JSS2">JSS 2</option>
+																			<option value="JSS3">JSS 3</option>
+																			<option value="SSS1">SSS 1</option>
+																			<option value="SSS2">SSS 2</option>
+																			<option value="SSS3">SSS 3</option>
 																		</select>
                                                                 </div>
                                                                 <div class="form-group">

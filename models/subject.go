@@ -12,6 +12,8 @@ type Subject struct {
 	gorm.Model
 	Image string
 	Name  string
+	// TODO: Change this to a boolean
+	IsCompulsory string
 	// TODO: We should enforce that it does a cascasde delete
 	SubjectClass []SubjectClass
 }

@@ -11,7 +11,7 @@ type Class struct {
 	gorm.Model
 	Name             string
 	ClassCoordinator string
-	NoOfStudent      int
+	Students         []Student
 }
 
 // Create a user object

@@ -857,37 +857,37 @@
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <div class="profile-info-inner">
                             <div class="profile-img">
-                                <img src="/img/student/{{.Image}}" alt="" />
+                                <img src="/img/student/{{.Student.Image}}" alt="" />
                             </div>
                             <div class="profile-details-hr">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-6">
                                         <div class="address-hr">
-                                            <p><b>Name</b><br /> {{.Name}}</p>
+                                            <p><b>Name</b><br /> {{.Student.Name}}</p>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-6">
                                         <div class="address-hr tb-sm-res-d-n dps-tb-ntn">
-                                            <p><b>Department</b><br /> {{.Class}}</p>
+                                            <p><b>Class</b><br /> {{.Student.ClassText}}</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-6">
                                         <div class="address-hr">
-                                            <p><b>Email ID</b><br /> {{.Email}}</p>
+                                            <p><b>Email</b><br /> {{.Student.Email}}</p>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-6">
                                         <div class="address-hr tb-sm-res-d-n dps-tb-ntn">
-                                            <p><b>Phone</b><br /> {{.PhoneNo}}</p>
+                                            <p><b>Phone</b><br /> {{.Student.PhoneNo}}</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <div class="address-hr">
-                                            <p><b>Address</b><br /> {{.Address}}</p>
+                                            <p><b>Address</b><br /> {{.Student.Address}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -906,8 +906,8 @@
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="content-profile">
-                                                            <h1>Notes about {{.Name}}</h1>
-                                                            <p>{{.Notes}}</p>
+                                                            <h1>Notes about {{.Student.Name}}</h1>
+                                                            <p>{{.Student.Notes}}</p>
                                                             
                                                         </div>
                                                     </div>

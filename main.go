@@ -5,8 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"sms-webapp/controllers"
+
+	"github.com/gorilla/mux"
 )
 
 // "log"
@@ -20,6 +21,8 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", controllers.DashboardHandler)
+	router.HandleFunc("/login", controllers.LoginHandler)
+	router.HandleFunc("/register", controllers.RegisterHandler)
 
 	router.HandleFunc("/add-student", controllers.AddStudentHandler)
 	router.HandleFunc("/add-subject", controllers.AddSubjectHandler)

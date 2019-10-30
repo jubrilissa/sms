@@ -15,9 +15,11 @@ type Student struct {
 	PhoneNo  string
 	Email    string
 	Religion string
-	Class    string
-	Image    string
-	Gender   string
+	ClassID  uint
+	// Use real Id not text
+	ClassText string
+	Image     string
+	Gender    string
 	// TODO: Should note not be somethinglike text
 	Notes       string
 	DateOfBirth *time.Time
@@ -32,9 +34,9 @@ func (student *Student) Create() uint {
 	// GetDB().Create(&student)
 	GetDB().Create(&student).Scan(&student)
 	fmt.Println("Student Id is ", student.ID)
-	studentId := student.ID
+	studentID := student.ID
 	fmt.Println("After running before running create")
-	return studentId
+	return studentID
 
 	// if err != nil {
 	// 	fmt.Print(err)

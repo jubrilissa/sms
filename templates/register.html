@@ -74,42 +74,42 @@
 			<div class="content-error">
 				<div class="hpanel">
                     <div class="panel-body">
-                        <form action="#" id="loginForm">
+                        <form action="#" id="loginForm" method="POST" action="/register">
                             <div class="row">
                                 <div class="form-group col-lg-12">
-                                    <label>Username</label>
-                                    <input class="form-control">
+                                    <label>Full Name</label>
+                                    <input class="form-control" type="text" name="fullName" required>
                                 </div>
                                 <div class="form-group col-lg-6">
-                                    <label>Password</label>
-                                    <input type="password" class="form-control">
-                                </div>
-                                <div class="form-group col-lg-6">
-                                    <label>Repeat Password</label>
-                                    <input type="password" class="form-control">
+                                    <label>Phone Number</label>
+                                    <input type="number" class="form-control" name="phoneNo" required maxlength="11">
                                 </div>
                                 <div class="form-group col-lg-6">
                                     <label>Email Address</label>
-                                    <input class="form-control">
+                                    <input class="form-control" type="email" name="email" required>
                                 </div>
                                 <div class="form-group col-lg-6">
+                                    <label>Password</label>
+                                    <input type="password" class="form-control" required name="password">
+                                </div>
+                                
+                                <!-- <div class="form-group col-lg-6">
                                     <label>Repeat Email Address</label>
                                     <input class="form-control">
-                                </div>
-                                <div class="checkbox col-lg-12">
-                                    <input type="checkbox" class="i-checks" checked> Sigh up for our newsletter
-                                </div>
+                                </div> -->
+                                
                             </div>
                             <div class="text-center">
-                                <button class="btn btn-success loginbtn">Register</button>
-                                <button class="btn btn-default">Cancel</button>
+                                <button class="btn btn-block btn-default" style="background: #006DF0; color: #fff;" type="submit">Register</button>
+                                <a class="btn btn-default btn-block" href="/login">Login</a>
+                                <!-- <a class="btn btn-success" href="/login" style="margin-left: 20px;">Visit Login</a> -->
                             </div>
                         </form>
                     </div>
                 </div>
 			</div>
 			<div class="text-center login-footer">
-				<p>Copyright © 2018. All rights reserved. Template by <a href="https://colorlib.com/wp/templates/">Colorlib</a></p>
+				<p>Copyright © 2019. All rights reserved. </p>
 			</div>
 		</div>   
     </div>
@@ -160,7 +160,7 @@
     <script src="js/main.js"></script>
     <!-- tawk chat JS
 		============================================ -->
-    <script src="js/tawk-chat.js"></script>
+    <!-- <script src="js/tawk-chat.js"></script> -->
 </body>
 
 </html>

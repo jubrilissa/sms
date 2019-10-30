@@ -9,10 +9,10 @@ import (
 // Class field (Model) defined
 type SubjectClass struct {
 	gorm.Model
-	Subject      string
 	Class        string
 	Teacher      int
 	IsCompulsory bool
+	SubjectID    uint
 }
 
 // Create a user object
@@ -44,4 +44,13 @@ func (subjectClass *SubjectClass) Create() {
 	// response := utils.Message(true, "user has been created")
 	// response["user"] = user
 
+}
+
+func GetSubjectsForClass(currentClass string) *SubjectClass {
+	subjectClass := &SubjectClass{}
+	err := GetDB().Table("subject_classes").Where("class = ?", currentClass).First(subjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return subjectClass
 }
