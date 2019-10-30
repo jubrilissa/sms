@@ -1,26 +1,120 @@
 package controllers
 
 import (
+	"encoding/gob"
 	"fmt"
 	"html/template"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"time"
 
 	"sms-webapp/models"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/securecookie"
+	"github.com/gorilla/sessions"
 )
 
 const (
 	templatesDir = "templates"
 )
 
+// store will hold all session data
+var store *sessions.CookieStore
+
+func init() {
+	authKeyOne := securecookie.GenerateRandomKey(64)
+	encryptionKeyOne := securecookie.GenerateRandomKey(32)
+
+	store = sessions.NewCookieStore(
+		authKeyOne,
+		encryptionKeyOne,
+	)
+
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   60 * 15,
+		HttpOnly: true,
+	}
+
+	gob.Register(models.User{})
+
+	// tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		tmpl := template.Must(template.ParseFiles("templates/login.html"))
+		tmpl.Execute(w, nil)
+	} else {
+		session, err := store.Get(r, "cookie-name")
+		r.ParseMultipartForm(32 << 20)
+		email := r.FormValue("email")
+		password := r.FormValue("password")
+
+		fmt.Println("Email is and password is ", email, password)
+		// TODO: Update the login here to return quickly for failed login
+		if models.Login(email, password) {
+			fmt.Println("Login SuccessFul")
+			session.Values["user"] = email
+			session.Values["authenticated"] = true
+
+			err = session.Save(r, w)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			http.Redirect(w, r, "/", http.StatusFound)
+
+		} else {
+			fmt.Println("Login Failed")
+			session.AddFlash("Login Failed")
+
+		}
+
+	}
+
+}
+
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+
+		tmpl := template.Must(template.ParseFiles("templates/register.html"))
+		tmpl.Execute(w, nil)
+	} else {
+		r.ParseMultipartForm(32 << 20)
+		name := r.FormValue("fullName")
+		phoneNo := r.FormValue("phoneNo")
+		email := r.FormValue("email")
+		password := r.FormValue("password")
+
+		user := &models.User{}
+		user.Name = name
+		user.PhoneNo = phoneNo
+		user.Email = email
+		user.Password = password
+
+		TeacherID := user.Create()
+
+		fmt.Println("The teacher Id is ", TeacherID)
+
+	}
+
+}
+
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	// tmpl := template.Must(template.ParseFiles("templates/index.html"))
+
+	// TODO: Uncomment the following below before deployment
+	// session, _ := store.Get(r, "cookie-name")
+	// if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+	// 	http.Error(w, "Forbidden", http.StatusForbidden)
+	// 	return
+	// }
 
 	files := []string{
 		filepath.Join(templatesDir, "index.html"),
@@ -109,6 +203,14 @@ func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
 		// do something else
 		// etc write header
 
+		classIdMap := make(map[string]uint)
+		classIdMap["jss1"] = 1
+		classIdMap["jss2"] = 2
+		classIdMap["jss3"] = 3
+		classIdMap["sss1"] = 4
+		classIdMap["sss2"] = 5
+		classIdMap["sss3"] = 6
+
 		// logic part of log in
 		name := r.FormValue("fullName")
 		address := r.FormValue("address")
@@ -130,7 +232,9 @@ func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
 		student.Address = address
 		student.PhoneNo = mobileno
 		student.Religion = religion
-		student.Class = class
+		student.ClassID = classIdMap[class]
+		student.ClassText = class
+		// student.Class = class
 		student.Gender = gender
 		student.DateOfBirth = &dateOfBirth
 		// student.DateOfBirth = dateOfBirth
@@ -175,29 +279,45 @@ func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
 func ViewAllSubjectHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method: ", r.Method)
 	if r.Method == "GET" {
+		data := models.GetAllSubjects()
+		fmt.Print(data[0].Name)
 
 		files := []string{
 			filepath.Join(templatesDir, "all-subjects.html"),
 			filepath.Join(templatesDir, "base.html"),
 		}
 
-		tmpl := template.Must(template.
-			ParseFiles(files...))
+		// tmpl := template.Must(template.
+		// 	ParseFiles(files...))
 
-		tmpl.Execute(w, nil)
+		tmpl, err := template.ParseFiles(files...)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		tmpl.Execute(w, &data)
 	} else {
 		fmt.Println("Got to the else part of viewing subjects")
 		r.ParseMultipartForm(32 << 20)
-		name := r.FormValue("subjectName")
+		name := r.FormValue("Subject")
 		// class := r.FormValue("class")
 		class := r.Form["class"]
+		isCompulsory := r.FormValue("isCompulsory")
 		fmt.Println("The name is ", name)
 		fmt.Println("The class is ", class)
+		fmt.Println("The isCompulsory is ", isCompulsory)
+
+		// TODO: Include the image for the subject also
+		subject := &models.Subject{}
+		subject.Name = name
+		subject.IsCompulsory = isCompulsory
+		subjectID := subject.Create()
 
 		for _, singleClass := range class {
 			subjectClass := &models.SubjectClass{}
 			subjectClass.Class = singleClass
-			subjectClass.Subject = name
+			subjectClass.SubjectID = subjectID
 			subjectClass.IsCompulsory = false
 			subjectClass.Create()
 		}
@@ -237,13 +357,31 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("method:", r.Method) //get request method
 	if r.Method == "GET" {
+
+		type PageVariables struct {
+			Student      *models.Student
+			SubjectClass *models.SubjectClass
+		}
 		requestParams := mux.Vars(r)
 		id, err := strconv.Atoi(requestParams["id"])
 
 		if err != nil {
 			panic(err.Error())
 		}
-		data := models.GetSingleStudentById(uint(id))
+		student := models.GetSingleStudentById(uint(id))
+
+		fmt.Println("The class is ", student.ClassText)
+
+		classSubject := models.GetSubjectsForClass(student.ClassText)
+
+		fmt.Println("The type of classsubject is ", reflect.TypeOf(classSubject))
+		fmt.Println("The type of data is ", reflect.TypeOf(student))
+
+		fmt.Println(classSubject)
+
+		pVariables := PageVariables{Student: student, SubjectClass: classSubject}
+
+		fmt.Println("The page variables are ", pVariables)
 
 		files := []string{
 			filepath.Join(templatesDir, "student-profile.html"),
@@ -253,8 +391,8 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.
 			ParseFiles(files...))
 
-		fmt.Println(data)
-		tmpl.Execute(w, data)
+		// fmt.Println(data)
+		tmpl.Execute(w, pVariables)
 
 	} else {
 		fmt.Println("I got to the else block")
@@ -390,7 +528,6 @@ func AddClassHandler(w http.ResponseWriter, r *http.Request) {
 		class.Name = name
 
 		class.ClassCoordinator = classCoordinator
-		class.NoOfStudent = 0
 
 		class.Create()
 		// fmt.Println("Student struct:", student)

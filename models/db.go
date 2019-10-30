@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+
 	// "os"
 
 	"github.com/jinzhu/gorm"
@@ -37,7 +38,7 @@ func init() {
 	db = conn
 	// defer db.Close()
 
-	db.Debug().AutoMigrate(&Student{}, &Class{}, &SubjectClass{})
+	db.Debug().AutoMigrate(&Student{}, &Class{}, &SubjectClass{}, &Subject{}, &User{})
 	// db.Create(&Student{Name: "isere", Address: "Test addres", PhoneNo: "08034246506", Religion: "Tester"})
 }
 
