@@ -12,35 +12,31 @@ type Subject struct {
 	gorm.Model
 	Image string
 	Name  string
+	// TODO: We should enforce that it does a cascasde delete
+	SubjectClass []SubjectClass
 }
 
 // Create a user object
-func (subject *Subject) Create() {
+func (subject *Subject) Create() uint {
 
 	fmt.Println(subject, "the subject object")
 
 	fmt.Println("Just before running create")
-	GetDB().Create(&subject)
+	GetDB().Create(&subject).Scan(&subject)
+	subjectID := subject.ID
 
-	// if err != nil {
-	// 	fmt.Print(err)
-	// 	panic(err.Error())
-	// }
+	return subjectID
 
-	// fmt.Println("resp:", &resp.)
+}
 
-	fmt.Println("After running before running create")
+func GetAllSubjects() []*Subject {
+	subjects := make([]*Subject, 0)
 
-	//Create new JWT token for the newly registered user
-	// claims := GenerateUserClaims(user.ID, user.Email)
+	err := GetDB().Table("subjects").Find(&subjects).Error
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
 
-	// token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
-	// tokenString, _ := token.SignedString([]byte(os.Getenv("PASSPHRASE")))
-	// user.Token = tokenString
-
-	// user.Password = "" //delete password
-
-	// response := utils.Message(true, "user has been created")
-	// response["user"] = user
-
+	return subjects
 }
