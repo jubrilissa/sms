@@ -46,6 +46,20 @@ func Login(email string, password string) bool {
 
 }
 
+func GetAllUserByRole(role string) []*User {
+	users := make([]*User, 0)
+
+	err := GetDB().Table("users").Where("role = ?", role).Find(&users).Error
+
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return users
+
+}
+
 // Validate incoming user details...
 // func (user *User) Validate() (map[string]interface{}, bool) {
 
