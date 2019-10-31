@@ -97,6 +97,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		user.PhoneNo = phoneNo
 		user.Email = email
 		user.Password = password
+		user.Role = "teacher"
 
 		TeacherID := user.Create()
 
@@ -133,14 +134,23 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ViewAllTeacherHandler(w http.ResponseWriter, r *http.Request) {
+
+	teachers := models.GetAllUserByRole("teacher")
+
+	fmt.Println("Printing the first teacher found ", teachers[0].Name)
+
 	files := []string{
 		filepath.Join(templatesDir, "all-teachers.html"),
 		filepath.Join(templatesDir, "base.html"),
 	}
-	tmpl := template.Must(template.
-		ParseFiles(files...))
+	// tmpl := template.Must(template.
+	// 	ParseFiles(files...))
+	tmpl, err := template.ParseFiles(files...)
+	if err != nil {
+		panic(err.Error())
+	}
 
-	tmpl.Execute(w, nil)
+	tmpl.Execute(w, &teachers)
 }
 
 func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
@@ -274,6 +284,10 @@ func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+}
+
+func AssignSubjectHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("method: ", r.Method)
 }
 
 func ViewAllSubjectHandler(w http.ResponseWriter, r *http.Request) {
