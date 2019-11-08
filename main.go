@@ -31,8 +31,6 @@ func main() {
 
 	router.HandleFunc("/students", controllers.ViewAllStudentHandler)
 	router.HandleFunc("/subjects", controllers.ViewAllSubjectHandler)
-	router.HandleFunc("/assign-subjects/{id:[0-9]+}", controllers.AssignSubjectHandler)
-
 	router.HandleFunc("/teachers", controllers.ViewAllTeacherHandler)
 	router.HandleFunc("/classes", controllers.ViewAllClassHandler)
 
