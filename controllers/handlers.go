@@ -97,10 +97,13 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		user.PhoneNo = phoneNo
 		user.Email = email
 		user.Password = password
+		user.Role = "teacher"
 
 		TeacherID := user.Create()
 
 		fmt.Println("The teacher Id is ", TeacherID)
+
+		http.Redirect(w, r, "/teachers", http.StatusTemporaryRedirect)
 
 	}
 
@@ -133,14 +136,24 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ViewAllTeacherHandler(w http.ResponseWriter, r *http.Request) {
+	teachers := models.GetAllUserByRole("teacher")
+
 	files := []string{
 		filepath.Join(templatesDir, "all-teachers.html"),
 		filepath.Join(templatesDir, "base.html"),
 	}
-	tmpl := template.Must(template.
-		ParseFiles(files...))
 
-	tmpl.Execute(w, nil)
+	tmpl, err := template.ParseFiles(files...)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// tmpl := template.Must(template.
+	// 	ParseFiles(files...))
+
+	tmpl.Execute(w, &teachers)
+
 }
 
 func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
@@ -339,6 +352,144 @@ func ViewAllClassHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 }
 
+func ViewAllGradeHandler(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		filepath.Join(templatesDir, "student-grade.html"),
+		filepath.Join(templatesDir, "base.html"),
+	}
+
+	tmpl := template.Must(template.
+		ParseFiles(files...))
+
+	tmpl.Execute(w, nil)
+}
+
+// AssignSubjectHandler - Assign subject to teacher handler
+func AssignSubjectHandler(w http.ResponseWriter, r *http.Request) {
+	// GetAllSubjectsDetails
+	fmt.Println("method: ", r.Method)
+	if r.Method == "GET" {
+		// data := models.GetAllSubjects()
+		data := models.GetAllSubjectsDetails()
+
+		fmt.Println(data)
+
+		files := []string{
+			filepath.Join(templatesDir, "assign-subjects.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		// tmpl := template.Must(template.
+		// 	ParseFiles(files...))
+
+		// tmpl.Execute(w, nil)
+
+		tmpl, err := template.ParseFiles(files...)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		tmpl.Execute(w, &data)
+	} else {
+		fmt.Println("Got to the else part of assigning subjects")
+		r.ParseMultipartForm(32 << 20)
+		// teacher := r.FormValue("")
+		teacher := 1
+
+		class := r.Form["subjectClass"]
+		fmt.Println("The class is", class)
+
+		for _, singleClass := range class {
+
+			intSingleClass, _ := strconv.ParseUint(singleClass, 10, 32)
+
+			respData := models.UpdateSubjectClassTeacher(uint(intSingleClass), uint(teacher))
+			fmt.Println(respData)
+		}
+
+	}
+
+}
+
+func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
+	// GetAllSubjectsDetails
+	fmt.Println("method: ", r.Method)
+	if r.Method == "GET" {
+
+		type SubjectClassDetails struct {
+			SubjectClass *models.SubjectClass
+			Subject      *models.Subject
+		}
+
+		var PageVariables []SubjectClassDetails
+
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+		student := models.GetSingleStudentById(uint(id))
+
+		// data := models.GetAllSubjects()
+		// data := models.GetSubjectsDetailsForClass(student.ClassText)
+		studentClass := student.ClassText
+		data := models.GetSubjectsForClass(studentClass)
+
+		for _, singleSubjectClass := range data {
+
+			// TODO: Check if the subject is compulsory ad drop from the list of struct with the corresponding subjectclass
+			fmt.Println(singleSubjectClass)
+			currentSubject := models.GetSubjectById(singleSubjectClass.SubjectID)
+
+			PageVariables = append(PageVariables, SubjectClassDetails{
+				SubjectClass: singleSubjectClass,
+				Subject:      currentSubject,
+			})
+
+		}
+
+		fmt.Println(data)
+
+		files := []string{
+			filepath.Join(templatesDir, "edit-student-subjects.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		// tmpl := template.Must(template.
+		// 	ParseFiles(files...))
+
+		// tmpl.Execute(w, nil)
+
+		tmpl, err := template.ParseFiles(files...)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		tmpl.Execute(w, &PageVariables)
+	} else {
+		fmt.Println("Got to the else part of assigning subjects")
+		r.ParseMultipartForm(32 << 20)
+		// teacher := r.FormValue("")
+		teacher := 1
+
+		class := r.Form["subjectClass"]
+		fmt.Println("The class is", class)
+
+		for _, singleClass := range class {
+
+			intSingleClass, _ := strconv.ParseUint(singleClass, 10, 32)
+
+			respData := models.UpdateSubjectClassTeacher(uint(intSingleClass), uint(teacher))
+			fmt.Println(respData)
+		}
+
+	}
+
+}
+
 func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 	// files := []string{
 	// 	filepath.Join(templatesDir, "student-profile.html"),
@@ -359,8 +510,8 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 
 		type PageVariables struct {
-			Student      *models.Student
-			SubjectClass *models.SubjectClass
+			Student *models.Student
+			// SubjectClass []*models.SubjectClass
 		}
 		requestParams := mux.Vars(r)
 		id, err := strconv.Atoi(requestParams["id"])
@@ -372,14 +523,15 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Println("The class is ", student.ClassText)
 
-		classSubject := models.GetSubjectsForClass(student.ClassText)
+		// classSubject := models.GetSubjectsForClass(student.ClassText)
 
-		fmt.Println("The type of classsubject is ", reflect.TypeOf(classSubject))
+		// fmt.Println("The type of classsubject is ", reflect.TypeOf(classSubject))
 		fmt.Println("The type of data is ", reflect.TypeOf(student))
 
-		fmt.Println(classSubject)
+		// fmt.Println(classSubject)
 
-		pVariables := PageVariables{Student: student, SubjectClass: classSubject}
+		pVariables := PageVariables{Student: student}
+		// pVariables := PageVariables{Student: student, SubjectClass: classSubject}
 
 		fmt.Println("The page variables are ", pVariables)
 

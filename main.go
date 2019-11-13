@@ -33,9 +33,13 @@ func main() {
 	router.HandleFunc("/subjects", controllers.ViewAllSubjectHandler)
 	router.HandleFunc("/teachers", controllers.ViewAllTeacherHandler)
 	router.HandleFunc("/classes", controllers.ViewAllClassHandler)
+	router.HandleFunc("/grade", controllers.ViewAllGradeHandler)
 
 	// router.HandleFunc("/student/{id}", controllers.ViewSingleStudentHandler).Methods("GET", "POST")
+
 	router.HandleFunc("/student-profile/{id:[0-9]+}", controllers.ViewSingleStudentHandler).Methods("GET", "POST")
+	router.HandleFunc("/assign-subject/{id:[0-9]+}", controllers.AssignSubjectHandler).Methods("GET", "POST")
+	router.HandleFunc("/update-subject/{id:[0-9]+}", controllers.UpdateSubjectHandler).Methods("GET", "POST")
 
 	// s := http.StripPrefix("/templates/", http.FileServer(http.Dir("./templates/")))
 	// router.PathPrefix("/templates/").Handler(s)

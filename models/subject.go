@@ -42,3 +42,62 @@ func GetAllSubjects() []*Subject {
 
 	return subjects
 }
+
+// type Deployment struct {
+//     gorm.Model
+//     Name        string `gorm:"unique_index:idx_name"`
+//     RestAPIUser string
+//     RestAPIPass string
+//     Servers     []Server
+//     model       *Model
+// }
+
+// type Server struct {
+//     gorm.Model
+//     DeploymentID uint
+//     Hostname     string `gorm:"unique_index:idx_hostname"`
+//     RestPort     string
+//     Version      string
+// }
+
+// func (m *Model) GetDeployments() ([]Deployment, error) {
+//     deployments := []Deployment{}
+//     return deployments, m.db.Preload("Servers").Find(&deployments).Error
+// }
+
+func GetAllSubjectsDetails() []*Subject {
+	subjects := make([]*Subject, 0)
+
+	err := GetDB().Preload("SubjectClass").Find(&subjects).Error
+
+	// err := GetDB().Table("subjects").Find(&subjects).Error
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return subjects
+}
+
+func GetSubjectsDetailsForClass(currentClass string) []*Subject {
+	subjects := make([]*Subject, 0)
+
+	err := GetDB().Preload("SubjectClass").Where("class =?", currentClass).Find(&subjects).Error
+
+	// err := GetDB().Table("subjects").Find(&subjects).Error
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return subjects
+}
+
+func GetSubjectById(id uint) *Subject {
+	subject := &Subject{}
+	err := GetDB().Table("subjects").Where("id = ?", id).First(subject).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return subject
+}

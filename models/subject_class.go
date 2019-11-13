@@ -12,6 +12,7 @@ type SubjectClass struct {
 	Class        string
 	Teacher      int
 	IsCompulsory bool
+	UserID       uint
 	SubjectID    uint
 }
 
@@ -46,11 +47,43 @@ func (subjectClass *SubjectClass) Create() {
 
 }
 
-func GetSubjectsForClass(currentClass string) *SubjectClass {
-	subjectClass := &SubjectClass{}
-	err := GetDB().Table("subject_classes").Where("class = ?", currentClass).First(subjectClass).Error
+// func GetSubjectsForClass(currentClass string) *SubjectClass {
+// 	subjectClass := &SubjectClass{}
+// 	err := GetDB().Table("subject_classes").Where("class = ?", currentClass).First(subjectClass).Error
+// 	if err != nil || err == gorm.ErrRecordNotFound {
+// 		return nil
+// 	}
+// 	return subjectClass
+// }
+
+func GetSubjectsForClass(currentClass string) []*SubjectClass {
+
+	subjectClass := make([]*SubjectClass, 0)
+	// db.Preload("Orders", func(db *gorm.DB) *gorm.DB {
+	// 	return db.Order("orders.amount DESC")
+	// }).Find(&users)
+	err := GetDB().Table("subject_classes").Where("class = ?", currentClass).Find(&subjectClass).Error
 	if err != nil || err == gorm.ErrRecordNotFound {
 		return nil
 	}
 	return subjectClass
 }
+
+func UpdateSubjectClassTeacher(id uint, teacher uint) *SubjectClass {
+	subjectClass := &SubjectClass{}
+	err := GetDB().Table("subject_classes").Where("id = ?", id).First(subjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+
+	GetDB().Model(&subjectClass).Update("user_id", teacher)
+	return subjectClass
+
+}
+
+// func GetSubjectClassDetails() []*SubjectClass {
+// 	subjectClass := make([]*SubjectClass, 0)
+
+// }
+
+// err := GetDB().Preload("SubjectClass").Where("class =?", currentClass).Find(&subjects).Error
