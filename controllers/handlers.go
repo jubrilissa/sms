@@ -369,6 +369,20 @@ func AssignSubjectHandler(w http.ResponseWriter, r *http.Request) {
 	// GetAllSubjectsDetails
 	fmt.Println("method: ", r.Method)
 	if r.Method == "GET" {
+
+		type AssignSubjectPageVariable struct {
+			Teacher     *models.User
+			AllSubjects []*models.Subject
+		}
+
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+		currentTeacher := models.GetUserByID(uint(id))
+
 		// data := models.GetAllSubjects()
 		data := models.GetAllSubjectsDetails()
 
@@ -389,8 +403,9 @@ func AssignSubjectHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err.Error())
 		}
+		pVariables := AssignSubjectPageVariable{Teacher: currentTeacher, AllSubjects: data}
 
-		tmpl.Execute(w, &data)
+		tmpl.Execute(w, &pVariables)
 	} else {
 		fmt.Println("Got to the else part of assigning subjects")
 		r.ParseMultipartForm(32 << 20)
@@ -408,6 +423,7 @@ func AssignSubjectHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(respData)
 		}
 
+		http.Redirect(w, r, "/teachers", http.StatusTemporaryRedirect)
 	}
 
 }

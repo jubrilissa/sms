@@ -852,12 +852,12 @@
         </div>
         <div class="contacts-area mg-b-15">
             <div class="container-fluid">
-                <h1>Assign Subject to Mr Razaq Enikomehin</h1>
+                <h1>Assign Subject to {{.Teacher.Name}}</h1>
                 <form action="/assign-subject/1" method="post" enctype="multipart/form-data">
                 
                 
                 
-                    {{ range  $index, $value := .}}
+                    {{ range  $index, $value := .AllSubjects}}
                     {{if eq $index 3 }}
                     <!-- TODO: Create a better condition for this This is currently wrong -->
                 <div class="row">

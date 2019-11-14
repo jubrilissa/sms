@@ -62,6 +62,16 @@ func GetAllUserByRole(role string) []*User {
 
 }
 
+// GetUserByID - Get the user object for a give id
+func GetUserByID(id uint) *User {
+	user := &User{}
+	err := GetDB().Table("users").Where("id = ?", id).First(user).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return user
+}
+
 // Validate incoming user details...
 // func (user *User) Validate() (map[string]interface{}, bool) {
 
