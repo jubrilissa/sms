@@ -407,10 +407,17 @@ func AssignSubjectHandler(w http.ResponseWriter, r *http.Request) {
 
 		tmpl.Execute(w, &pVariables)
 	} else {
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+
 		fmt.Println("Got to the else part of assigning subjects")
 		r.ParseMultipartForm(32 << 20)
 		// teacher := r.FormValue("")
-		teacher := 1
+		teacher := id
 
 		class := r.Form["subjectClass"]
 		fmt.Println("The class is", class)
@@ -428,6 +435,7 @@ func AssignSubjectHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// UpdateSubjectHandler - Update the optional subject for the current user
 func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 	// GetAllSubjectsDetails
 	fmt.Println("method: ", r.Method)
@@ -439,6 +447,10 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var PageVariables []SubjectClassDetails
+		type StudentSubjectClassPageVariable struct {
+			Student             *models.Student
+			SubjectClassDetails []SubjectClassDetails
+		}
 
 		requestParams := mux.Vars(r)
 		id, err := strconv.Atoi(requestParams["id"])
@@ -455,8 +467,9 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 
 		for _, singleSubjectClass := range data {
 
-			// TODO: Check if the subject is compulsory ad drop from the list of struct with the corresponding subjectclass
+			// TODO: Check if the subject is compulsory and drop from the list of struct with the corresponding subjectclass
 			fmt.Println(singleSubjectClass)
+
 			currentSubject := models.GetSubjectById(singleSubjectClass.SubjectID)
 
 			PageVariables = append(PageVariables, SubjectClassDetails{
@@ -464,6 +477,11 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 				Subject:      currentSubject,
 			})
 
+		}
+
+		finalPVariables := StudentSubjectClassPageVariable{
+			Student:             student,
+			SubjectClassDetails: PageVariables,
 		}
 
 		fmt.Println(data)
@@ -484,7 +502,7 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 			panic(err.Error())
 		}
 
-		tmpl.Execute(w, &PageVariables)
+		tmpl.Execute(w, finalPVariables)
 	} else {
 		fmt.Println("Got to the else part of assigning subjects")
 		r.ParseMultipartForm(32 << 20)
