@@ -419,6 +419,8 @@ func AssignSubjectHandler(w http.ResponseWriter, r *http.Request) {
 		// teacher := r.FormValue("")
 		teacher := id
 
+		fmt.Println("The teacher id is ", teacher)
+
 		class := r.Form["subjectClass"]
 		fmt.Println("The class is", class)
 
