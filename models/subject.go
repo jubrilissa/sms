@@ -101,3 +101,17 @@ func GetSubjectById(id uint) *Subject {
 	}
 	return subject
 }
+
+func GetSubjectBySubjectClassId(id uint) *Subject {
+	subjects := &Subject{}
+
+	err := GetDB().Preload("SubjectClass").Where("id =?", id).First(&subjects).Error
+
+	// err := GetDB().Table("subjects").Find(&subjects).Error
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return subjects
+}

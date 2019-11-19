@@ -925,18 +925,21 @@
                                                         </div>
                                                         <div class="ex-pro">
                                                             <ul>
-                                                                <li><i class="fa fa-angle-right"></i> Yoruba.</li>
+                                                                    {{ range  $index, $value := .Subject}}
+                                                                    <li><i class="fa fa-angle-right"></i> {{.Name}}.</li>
+                                                                    {{end}}
+                                                                <!-- <li><i class="fa fa-angle-right"></i> Yoruba.</li>
                                                                 <li><i class="fa fa-angle-right"></i> Chemistry.</li>
                                                                 <li><i class="fa fa-angle-right"></i> Physics.</li>
                                                                 <li><i class="fa fa-angle-right"></i> Biology.</li>
                                                                 <li><i class="fa fa-angle-right"></i> History.</li>
                                                                 <li><i class="fa fa-angle-right"></i> Yoruba.</li>
                                                                 <li><i class="fa fa-angle-right"></i> English Language.</li>
-                                                                <li><i class="fa fa-angle-right"></i> mathematics.</li>
+                                                                <li><i class="fa fa-angle-right"></i> mathematics.</li> -->
                                                                 
                                                             </ul>
                                                             <!-- TODO: Re-add this after flow is complete -->
-                                                            <!-- <p><a href="/update-subject/{{.Student.ID}}">Update subjects</a></p> -->
+                                                            <p><a href="/update-subject/{{.Student.ID}}">Update subjects</a></p>
                                                         </div>
                                                     </div>
                                                 </div>

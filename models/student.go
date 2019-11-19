@@ -80,3 +80,37 @@ func GetSingleStudentById(id uint) *Student {
 	}
 	return student
 }
+
+// GetSubjectsClassForStudentByID - Return the subject the student take in a given class
+func GetSubjectsClassForStudentByID(id uint) []*StudentSubjectClass {
+	studentSubjectClass := make([]*StudentSubjectClass, 0)
+	err := GetDB().Table("student_subject_classes").Where("student_id = ?", id).Find(&studentSubjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return studentSubjectClass
+}
+
+func GetSubjectsClassForStudentByID2(id uint) []*Subject {
+	studentSubjectClass := make([]*Subject, 0)
+
+	err := GetDB().Preload("student_subject_classes").Where("id = ?", id).Find(&studentSubjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return studentSubjectClass
+}
+
+// func GetSubjectsDetailsForClass(currentClass string) []*Subject {
+// 	subjects := make([]*Subject, 0)
+
+// 	err := GetDB().Preload("SubjectClass").Where("class =?", currentClass).Find(&subjects).Error
+
+// 	// err := GetDB().Table("subjects").Find(&subjects).Error
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return nil
+// 	}
+
+// 	return subjects
+// }

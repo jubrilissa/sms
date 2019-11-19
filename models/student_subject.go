@@ -21,3 +21,15 @@ func (studentSubjectClass *StudentSubjectClass) Create() {
 	fmt.Println("Just before running create")
 	GetDB().Create(&studentSubjectClass)
 }
+
+func UpdateStudentSubjectClassTeacher(id uint, teacher uint) *SubjectClass {
+	subjectClass := &SubjectClass{}
+	err := GetDB().Table("student_subject_classes").Where("id = ?", id).First(subjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+
+	GetDB().Model(&subjectClass).Update("user_id", teacher)
+	return subjectClass
+
+}

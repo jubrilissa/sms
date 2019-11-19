@@ -437,7 +437,7 @@ func AssignSubjectHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// UpdateSubjectHandler - Update the optional subject for the current user
+// UpdateSubjectHandler - Update the optional subject for student
 func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 	// GetAllSubjectsDetails
 	fmt.Println("method: ", r.Method)
@@ -474,10 +474,16 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 
 			currentSubject := models.GetSubjectById(singleSubjectClass.SubjectID)
 
-			PageVariables = append(PageVariables, SubjectClassDetails{
-				SubjectClass: singleSubjectClass,
-				Subject:      currentSubject,
-			})
+			fmt.Println("The current subject is ", currentSubject)
+			fmt.Println("The single subject id is ", singleSubjectClass.SubjectID)
+
+			// We are Only considering subjects that are not compulsory. Compulsory subjects are automatically added
+			if currentSubject.IsCompulsory == "NO" {
+				PageVariables = append(PageVariables, SubjectClassDetails{
+					SubjectClass: singleSubjectClass,
+					Subject:      currentSubject,
+				})
+			}
 
 		}
 
@@ -493,6 +499,9 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 			filepath.Join(templatesDir, "base.html"),
 		}
 
+		fmt.Println("The subject Class Details is ", finalPVariables.SubjectClassDetails)
+		// fmt.Println("The subject Class Details is ", finalPVariables.SubjectClassDetails[0].Subject.Name)
+
 		// tmpl := template.Must(template.
 		// 	ParseFiles(files...))
 
@@ -506,21 +515,37 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 
 		tmpl.Execute(w, finalPVariables)
 	} else {
+
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
 		fmt.Println("Got to the else part of assigning subjects")
 		r.ParseMultipartForm(32 << 20)
-		// teacher := r.FormValue("")
-		teacher := 1
+		studentID := id
 
 		class := r.Form["subjectClass"]
 		fmt.Println("The class is", class)
 
 		for _, singleClass := range class {
-
 			intSingleClass, _ := strconv.ParseUint(singleClass, 10, 32)
+			studentSubjectClass := &models.StudentSubjectClass{}
 
-			respData := models.UpdateSubjectClassTeacher(uint(intSingleClass), uint(teacher))
-			fmt.Println(respData)
+			studentSubjectClass.IsActive = true
+			studentSubjectClass.StudentID = uint(studentID)
+			studentSubjectClass.SubjectClassID = uint(intSingleClass)
+			studentSubjectClass.Create()
+
+			// intSingleClass, _ := strconv.ParseUint(singleClass, 10, 32)
+
+			// respData := models.UpdateSubjectClassTeacher(uint(intSingleClass), uint(teacher))
+
+			// fmt.Println(respData)
 		}
+		redirectURL := fmt.Sprintf("/student-profile/%d", studentID)
+		http.Redirect(w, r, redirectURL, http.StatusFound)
 
 	}
 
@@ -547,8 +572,10 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 
 		type PageVariables struct {
 			Student *models.Student
+			Subject []*models.Subject
 			// SubjectClass []*models.SubjectClass
 		}
+
 		requestParams := mux.Vars(r)
 		id, err := strconv.Atoi(requestParams["id"])
 
@@ -559,14 +586,32 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Println("The class is ", student.ClassText)
 
-		// classSubject := models.GetSubjectsForClass(student.ClassText)
+		classSubject := models.GetSubjectsClassForStudentByID(uint(id))
+
+		fmt.Println("The class subject is ", classSubject)
+
+		StudentSubjects := make([]*models.Subject, 0)
+		for _, singleClassSubject := range classSubject {
+			singleSubject := models.GetSubjectBySubjectClassId(singleClassSubject.SubjectClassID)
+
+			StudentSubjects = append(StudentSubjects, singleSubject)
+
+		}
+
+		fmt.Println(StudentSubjects)
+
+		// var StudentSubjects []models.Subject
+
+		// for _, singleClassSubject := range classSubject {
+		// 	StudentSubjects = append(StudentSubjects, )
+		// }
 
 		// fmt.Println("The type of classsubject is ", reflect.TypeOf(classSubject))
 		fmt.Println("The type of data is ", reflect.TypeOf(student))
 
 		// fmt.Println(classSubject)
 
-		pVariables := PageVariables{Student: student}
+		pVariables := PageVariables{Student: student, Subject: StudentSubjects}
 		// pVariables := PageVariables{Student: student, SubjectClass: classSubject}
 
 		fmt.Println("The page variables are ", pVariables)
