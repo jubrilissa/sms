@@ -103,15 +103,14 @@ func GetSubjectById(id uint) *Subject {
 }
 
 func GetSubjectBySubjectClassId(id uint) *Subject {
-	subjects := &Subject{}
 
-	err := GetDB().Preload("SubjectClass").Where("id =?", id).First(&subjects).Error
-
-	// err := GetDB().Table("subjects").Find(&subjects).Error
-	if err != nil {
-		fmt.Println(err)
+	subjectClass := &SubjectClass{}
+	err := GetDB().Table("subject_classes").Where("id = ?", id).First(subjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
 		return nil
 	}
+
+	subjects := GetSubjectById(subjectClass.SubjectID)
 
 	return subjects
 }
