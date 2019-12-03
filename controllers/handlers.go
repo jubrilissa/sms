@@ -95,7 +95,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, "/your-subject", http.StatusFound)
 
 		} else {
 			fmt.Println("Login Failed")

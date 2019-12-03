@@ -123,8 +123,8 @@
                         <li>
                             <a class="has-arrow" href="/subjects" aria-expanded="false"><span class="educate-icon educate-course icon-wrap"></span> <span class="mini-click-non">Subjects</span></a>
                             <ul class="submenu-angle" aria-expanded="false">
-                                <li><a title="All Courses" href="/subjects"><span class="mini-sub-pro">All Subjects</span></a></li>
-                                <li><a title="Add Courses" href="/add-subject"><span class="mini-sub-pro">Add Subject</span></a></li>
+                                <!-- <li><a title="All Courses" href="/subjects"><span class="mini-sub-pro">All Subjects</span></a></li>
+                                <li><a title="Add Courses" href="/add-subject"><span class="mini-sub-pro">Add Subject</span></a></li> -->
                                 <li><a title="Edit Courses" href="/your-subject"><span class="mini-sub-pro">Your Subject</span></a></li>                            
                                 <!-- <li><a title="Edit Courses" href="edit-course.html"><span class="mini-sub-pro">Edit Subject</span></a></li>                             -->
                             </ul>
@@ -165,6 +165,146 @@
     <!-- End Left menu area -->
     <!-- Start Welcome area -->
     <div class="all-content-wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="logo-pro">
+                        <a href="index.html"><img class="main-logo" src="img/logo/logo.png" alt="" /></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="header-advance-area">
+            <div class="header-top-area">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="header-top-wraper">
+                                <div class="row">
+                                    <div class="col-lg-1 col-md-0 col-sm-1 col-xs-12">
+                                        <div class="menu-switcher-pro">
+                                            <button type="button" id="sidebarCollapse" class="btn bar-button-pro header-drl-controller-btn btn-info navbar-btn">
+													<i class="educate-icon educate-nav"></i>
+												</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-7 col-sm-6 col-xs-12">
+                                        <div class="header-top-menu tabl-d-n">
+                                            <ul class="nav navbar-nav mai-top-nav">
+                                                <li class="nav-item"><a href="#" class="nav-link">Home</a>
+                                                </li>
+                                                <li class="nav-item"><a href="#" class="nav-link">About</a>
+                                                </li>
+                                                <li class="nav-item"><a href="#" class="nav-link">Services</a>
+                                                </li>
+                                                <li class="nav-item dropdown res-dis-nn">
+                                                    <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">Project <span class="angle-down-topmenu"><i class="fa fa-angle-down"></i></span></a>
+                                                    <div role="menu" class="dropdown-menu animated zoomIn">
+                                                        <a href="#" class="dropdown-item">Documentation</a>
+                                                        <a href="#" class="dropdown-item">Expert Backend</a>
+                                                        <a href="#" class="dropdown-item">Expert FrontEnd</a>
+                                                        <a href="#" class="dropdown-item">Contact Support</a>
+                                                    </div>
+                                                </li>
+                                                <li class="nav-item"><a href="#" class="nav-link">Support</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile Menu start -->
+            <div class="mobile-menu-area">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="mobile-menu">
+                                <nav id="dropdown">
+                                    <ul class="mobile-menu-nav">
+                                        <li><a data-toggle="collapse" data-target="#Charts" href="/">Home <span class="admin-project-icon edu-icon edu-down-arrow"></span></a>                                           
+                                        </li>                                        
+                                        <li><a data-toggle="collapse" data-target="#demoevent" href="/teachers">Teachers <span class="admin-project-icon edu-icon edu-down-arrow"></span></a>
+                                            <ul id="demoevent" class="collapse dropdown-header-top">
+                                                <li><a href="/teachers">All Teachers</a>
+                                                </li>
+                                               
+                                            </ul>
+                                        </li>
+                                        <li><a data-toggle="collapse" data-target="#demopro" href="#">Students <span class="admin-project-icon edu-icon edu-down-arrow"></span></a>
+                                            <ul id="demopro" class="collapse dropdown-header-top">
+                                                <li><a href="/students">All Students</a>
+                                                </li>
+                                                <li><a href="/add-student">Add Student</a>
+                                                </li>
+                                                <li><a href="/edit-student">Edit Student</a>
+                                                </li>
+                                                <li><a href="/student-profile">Student Profile</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a data-toggle="collapse" data-target="#democrou" href="#">Subjects <span class="admin-project-icon edu-icon edu-down-arrow"></span></a>
+                                            <ul id="democrou" class="collapse dropdown-header-top">
+                                                <!-- <li><a href="/subjects">All Subjects</a>
+                                                </li>
+                                                <li><a href="/add-subject">Add Subject</a>
+                                                </li> -->
+                                                <li><a href="/your-subject">Your Subject</a>
+                                                </li>                                                
+                                            </ul>
+                                        </li>
+                                        
+                                        <li><a data-toggle="collapse" data-target="#demodepart" href="#">Classes <span class="admin-project-icon edu-icon edu-down-arrow"></span></a>
+                                            <ul id="demodepart" class="collapse dropdown-header-top">
+                                                <li><a href="/classes">Class List</a>
+                                                </li>
+                                                <li><a href="/add-class">Add Class</a>
+                                                </li>
+                                                <li><a href="/edit-class">Edit Class</a>
+                                                </li>
+                                            </ul>
+                                        </li>                                       
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile Menu end -->
+            <div class="breadcome-area">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="breadcome-list">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="breadcome-heading">
+                                            <form role="search" class="sr-input-func">
+                                                <input type="text" placeholder="Search..." class="search-int form-control">
+                                                <a href="#"><i class="fa fa-search"></i></a>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <ul class="breadcome-menu">
+                                            <li><a href="#">Home</a> <span class="bread-slash">/</span>
+                                            </li>
+                                            <li><span class="bread-blod">Dashboard V.1</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {{template "main" .}}
         
         
