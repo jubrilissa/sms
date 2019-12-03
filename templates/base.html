@@ -54,6 +54,17 @@
 		============================================ -->
     <link rel="stylesheet" href="/css/calendar/fullcalendar.min.css">
     <link rel="stylesheet" href="/css/calendar/fullcalendar.print.min.css">
+    
+    <!-- x-editor CSS
+		============================================ -->
+    <link rel="stylesheet" href="css/editor/select2.css">
+    <link rel="stylesheet" href="css/editor/datetimepicker.css">
+    <link rel="stylesheet" href="css/editor/bootstrap-editable.css">
+    <link rel="stylesheet" href="css/editor/x-editor-style.css">
+    <!-- normalize CSS
+		============================================ -->
+    <link rel="stylesheet" href="css/data-table/bootstrap-table.css">
+    <link rel="stylesheet" href="css/data-table/bootstrap-editable.css">
     <!-- style CSS
 		============================================ -->
     <link rel="stylesheet" href="/style.css">
@@ -97,7 +108,7 @@
                                 <li><a title="All Professors" href="/teachers"><span class="mini-sub-pro">All Teachers</span></a></li>
                                 <!-- <li><a title="Add Professor" href="/add-teacher"><span class="mini-sub-pro">Add Teacher</span></a></li> -->
                                 <!-- <li><a title="Edit Professor" href="/edit-student"><span class="mini-sub-pro">Edit Teacher</span></a></li> -->
-                                <li><a title="Professor Profile" href="professor-profile.html"><span class="mini-sub-pro">Teacher Profile</span></a></li>
+                                <!-- <li><a title="Professor Profile" href="professor-profile.html"><span class="mini-sub-pro">Teacher Profile</span></a></li> -->
                             </ul>
                         </li>
                         <li>
@@ -114,7 +125,8 @@
                             <ul class="submenu-angle" aria-expanded="false">
                                 <li><a title="All Courses" href="/subjects"><span class="mini-sub-pro">All Subjects</span></a></li>
                                 <li><a title="Add Courses" href="/add-subject"><span class="mini-sub-pro">Add Subject</span></a></li>
-                                <li><a title="Edit Courses" href="edit-course.html"><span class="mini-sub-pro">Edit Subject</span></a></li>                            
+                                <li><a title="Edit Courses" href="/your-subject"><span class="mini-sub-pro">Your Subject</span></a></li>                            
+                                <!-- <li><a title="Edit Courses" href="edit-course.html"><span class="mini-sub-pro">Edit Subject</span></a></li>                             -->
                             </ul>
                         </li>
                         
@@ -130,7 +142,7 @@
                           <a class="has-arrow" href="/classes" aria-expanded="false"><span class="educate-icon educate-charts icon-wrap"></span> <span class="mini-click-non">Grades</span></a>
                           <ul class="submenu-angle" aria-expanded="false">
                               <li><a title="Departments List" href="/grade"><span class="mini-sub-pro">Enter Grade</span></a></li>
-                              <li><a title="Add Departments" href="/grade"><span class="mini-sub-pro">Add Grade</span></a></li>
+                              <li><a title="Add Departments" href="/result"><span class="mini-sub-pro">Add Grade</span></a></li>
                               <!-- <li><a title="Edit Departments" href="/edit-class"><span class="mini-sub-pro">Edit Class</span></a></li> -->
                           </ul>
                       </li>
@@ -206,6 +218,32 @@
 		============================================ -->
     <script src="/js/metisMenu/metisMenu.min.js"></script>
     <script src="/js/metisMenu/metisMenu-active.js"></script>
+    <!-- data table JS
+		============================================ -->
+    <script src="js/data-table/bootstrap-table.js"></script>
+    <script src="js/data-table/tableExport.js"></script>
+    <script src="js/data-table/data-table-active.js"></script>
+    <script src="js/data-table/bootstrap-table-editable.js"></script>
+    <script src="js/data-table/bootstrap-editable.js"></script>
+    <script src="js/data-table/bootstrap-table-resizable.js"></script>
+    <script src="js/data-table/colResizable-1.5.source.js"></script>
+    <script src="js/data-table/bootstrap-table-export.js"></script>
+    <!--  editable JS
+		============================================ -->
+    <script src="js/editable/jquery.mockjax.js"></script>
+    <script src="js/editable/mock-active.js"></script>
+    <script src="js/editable/select2.js"></script>
+    <script src="js/editable/moment.min.js"></script>
+    <script src="js/editable/bootstrap-datetimepicker.js"></script>
+    <script src="js/editable/bootstrap-editable.js"></script>
+    <script src="js/editable/xediable-active.js"></script>
+    <!-- Chart JS
+		============================================ -->
+    <script src="js/chart/jquery.peity.min.js"></script>
+    <script src="js/peity/peity-active.js"></script>
+    <!-- tab JS
+		============================================ -->
+    <script src="js/tab.js"></script>
     <!-- morrisjs JS
 		============================================ -->
     <script src="/js/morrisjs/raphael-min.js"></script>

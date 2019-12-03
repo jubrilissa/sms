@@ -21,10 +21,15 @@ func init() {
 	// host := os.Getenv("PGHOST")
 	// user := os.Getenv("PGUSER")
 	// dbname := os.Getenv("PGDBNAME")
+	// password := ""
+	// host := "localhost"
+	// user := "masterp"
+	// dbname := "sms"
+
 	password := ""
 	host := "localhost"
 	user := "masterp"
-	dbname := "sms"
+	dbname := "dev_sms_backup"
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s", host, port, user, dbname, password)
 

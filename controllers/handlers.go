@@ -23,6 +23,7 @@ const (
 	templatesDir = "templates"
 )
 
+// TODO: Not necessarily a todo just the guide for the implementation
 // store will hold all session data
 var store *sessions.CookieStore
 
@@ -37,7 +38,7 @@ func init() {
 
 	store.Options = &sessions.Options{
 		Path:     "/",
-		MaxAge:   60 * 15,
+		MaxAge:   60 * 60, // TODO: Update the time here to something reasonable like a day
 		HttpOnly: true,
 	}
 
@@ -45,6 +46,27 @@ func init() {
 
 	// tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
 }
+
+func getUser(s *sessions.Session) models.User {
+	val := s.Values["user"]
+	var user = models.User{}
+	user, ok := val.(models.User)
+	if !ok {
+		// return models.User{Authenticated: false}
+		return models.User{}
+	}
+	return user
+}
+
+// func getUser2(s *sessions.Session) User {
+// 	val := s.Values["user"]
+// 	var user = User{}
+// 	user, ok := val.(User)
+// 	if !ok {
+// 		return User{Authenticated: false}
+// 	}
+// 	return user
+// }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -59,12 +81,17 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Email is and password is ", email, password)
 		// TODO: Update the login here to return quickly for failed login
 		if models.Login(email, password) {
+			currentUser := models.GetUserByEmail(email)
 			fmt.Println("Login SuccessFul")
 			session.Values["user"] = email
 			session.Values["authenticated"] = true
+			session.Values["user"] = currentUser
+
+			fmt.Println("The user has name of ", currentUser.Name)
 
 			err = session.Save(r, w)
 			if err != nil {
+				session.AddFlash("Error when trying to log in")
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -109,15 +136,44 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := store.Get(r, "cookie-name")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	session.Values["user"] = models.User{}
+	session.Options.MaxAge = -1
+
+	err = session.Save(r, w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/login", http.StatusFound)
+
+}
+
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	// tmpl := template.Must(template.ParseFiles("templates/index.html"))
 
 	// TODO: Uncomment the following below before deployment
-	// session, _ := store.Get(r, "cookie-name")
-	// if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-	// 	http.Error(w, "Forbidden", http.StatusForbidden)
-	// 	return
-	// }
+	session, _ := store.Get(r, "cookie-name")
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		// http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	currentUser := getUser(session)
+
+	if currentUser.Role != "principal" {
+		// TODO: This should ideally move to the forbidden page
+		http.Redirect(w, r, "/login", http.StatusFound)
+		// http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
 
 	files := []string{
 		filepath.Join(templatesDir, "index.html"),
@@ -289,6 +345,88 @@ func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func ViewYourSubjectHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		// http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	currentUser := getUser(session)
+
+	fmt.Println("method: ", r.Method)
+	if r.Method == "GET" {
+		type TeacherSubjectVariable struct {
+			SubjectClass *models.SubjectClass
+			Subject      *models.Subject
+		}
+
+		var SubjectsDetails []TeacherSubjectVariable
+		type TeacherSubjectsPageVariable struct {
+			Teacher             models.User
+			SubjectClassDetails []TeacherSubjectVariable
+		}
+		teacherSubjectClass := models.GetSubjectClassForTeacher(currentUser.ID)
+
+		for _, singleSubjectClass := range teacherSubjectClass {
+
+			currentSubject := models.GetSubjectById(singleSubjectClass.SubjectID)
+			SubjectsDetails = append(SubjectsDetails, TeacherSubjectVariable{
+				SubjectClass: singleSubjectClass,
+				Subject:      currentSubject,
+			})
+		}
+		finalPVariables := TeacherSubjectsPageVariable{
+			Teacher:             currentUser,
+			SubjectClassDetails: SubjectsDetails,
+		}
+
+		files := []string{
+			filepath.Join(templatesDir, "all-teachers-subjects.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		// tmpl := template.Must(template.
+		// 	ParseFiles(files...))
+
+		tmpl, err := template.ParseFiles(files...)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		tmpl.Execute(w, &finalPVariables)
+	} else {
+		fmt.Println("Got to the else part of viewing subjects")
+		r.ParseMultipartForm(32 << 20)
+		name := r.FormValue("Subject")
+		// class := r.FormValue("class")
+		class := r.Form["class"]
+		isCompulsory := r.FormValue("isCompulsory")
+		fmt.Println("The name is ", name)
+		fmt.Println("The class is ", class)
+		fmt.Println("The isCompulsory is ", isCompulsory)
+
+		// TODO: Include the image for the subject also
+		subject := &models.Subject{}
+		subject.Name = name
+		subject.IsCompulsory = isCompulsory
+		subjectID := subject.Create()
+
+		for _, singleClass := range class {
+			subjectClass := &models.SubjectClass{}
+			subjectClass.Class = singleClass
+			subjectClass.SubjectID = subjectID
+			subjectClass.IsCompulsory = false
+			subjectClass.Create()
+		}
+
+		http.Redirect(w, r, "/subjects", http.StatusFound)
+
+	}
+}
+
 func ViewAllSubjectHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method: ", r.Method)
 	if r.Method == "GET" {
@@ -352,9 +490,124 @@ func ViewAllClassHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 }
 
+func add(x, y int) int {
+	return x + y
+}
+
+func GradeStudentsHandler(w http.ResponseWriter, r *http.Request) {
+
+	// TODO: Fix the hack for loading static files for path variables
+	session, _ := store.Get(r, "cookie-name")
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		// TODO: Think through how unauthorized users should be handled
+		http.Redirect(w, r, "/login", http.StatusFound)
+		// http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	currentUser := getUser(session)
+
+	requestParams := mux.Vars(r)
+	id, err := strconv.Atoi(requestParams["id"])
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	currentSubjectClass := models.GetSubjectClassById(uint(id))
+
+	if currentSubjectClass.UserID != currentUser.ID {
+		// TODO: Think through how unauthorized users should be handled
+		http.Redirect(w, r, "/login", http.StatusFound)
+		// http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	studentsForSubject := models.GetStudentSubjectsClassBySubjectClassID(currentSubjectClass.ID)
+
+	type StudentSubjectDetails struct {
+		Student        *models.Student
+		StudentSubject *models.StudentSubjectClass
+	}
+
+	var PageVariables []StudentSubjectDetails
+
+	for _, singleStudentSubject := range studentsForSubject {
+		currentStudent := models.GetSingleStudentById(singleStudentSubject.StudentID)
+		PageVariables = append(PageVariables, StudentSubjectDetails{
+			Student:        currentStudent,
+			StudentSubject: singleStudentSubject,
+		})
+
+	}
+
+	files := []string{
+		filepath.Join(templatesDir, "result-page.html"),
+		filepath.Join(templatesDir, "base.html"),
+	}
+
+	// funcs := template.FuncMap{"add": add}
+
+	tmpl := template.Must(template.
+		ParseFiles(files...))
+
+	// tmpl := template.Must(template.New("result-page.html").Funcs(funcs).
+	// 	ParseFiles(files...))
+
+	tmpl.Execute(w, PageVariables)
+}
+
 func ViewAllGradeHandler(w http.ResponseWriter, r *http.Request) {
 	files := []string{
-		filepath.Join(templatesDir, "student-grade.html"),
+		filepath.Join(templatesDir, "student-grade-old.html"),
+		filepath.Join(templatesDir, "base.html"),
+	}
+
+	tmpl := template.Must(template.
+		ParseFiles(files...))
+
+	tmpl.Execute(w, nil)
+}
+
+func ViewResultHandler(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		filepath.Join(templatesDir, "result-page-old.html"),
+		filepath.Join(templatesDir, "base.html"),
+	}
+
+	tmpl := template.Must(template.
+		ParseFiles(files...))
+
+	tmpl.Execute(w, nil)
+}
+
+func UpdateGradeHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("The request method is ", r.Method)
+	r.ParseForm()
+
+	fieldName := r.FormValue("name")
+	scoreValue := r.FormValue("value")
+	studentSubjectClassID := r.FormValue("pk")
+	// stringSlice := strings.Split(r.FormValue("pk"), "-")
+
+	// studentID := stringSlice[1]
+	// subjectClassID := stringSlice[0]
+
+	fmt.Println(fieldName)
+	fmt.Println(studentSubjectClassID)
+	// fmt.Println(studentID)
+	// fmt.Println(subjectClassID)
+	fmt.Println(scoreValue)
+
+	intStudentSubjectClassID, _ := strconv.ParseUint(studentSubjectClassID, 10, 32)
+	intScoreValue, _ := strconv.ParseUint(scoreValue, 10, 32)
+
+	studentSubjectClass := models.UpdateStudentscore(uint(intStudentSubjectClassID), fieldName, float32(intScoreValue))
+
+	fmt.Println(studentSubjectClass)
+
+	files := []string{
+		filepath.Join(templatesDir, "result-page-old.html"),
 		filepath.Join(templatesDir, "base.html"),
 	}
 
@@ -548,6 +801,130 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, redirectURL, http.StatusFound)
 
 	}
+
+}
+
+func GetRemarkFromScore(score float32) string {
+	// TODO: Update this condition
+	if score >= 70 {
+		return "EXCELLENT"
+	} else if score >= 60 && score < 70 {
+		return "VERY GOOD"
+	} else if score >= 50 && score < 60 {
+		return "GOOD"
+	} else if score >= 40 && score < 50 {
+		return "PASS"
+	} else {
+		return "POOR"
+	}
+}
+
+func GetGradeFromScore(score float32) string {
+	if score >= 70 {
+		return "A"
+	} else if score >= 60 && score < 70 {
+		return "B"
+	} else if score >= 50 && score < 60 {
+		return "C"
+	} else if score >= 45 && score < 50 {
+		return "D"
+	} else if score >= 40 && score < 45 {
+		return "E"
+	} else {
+		return "F"
+	}
+}
+
+func GetTeacherRemarkFromPercentage(percentage float32) string {
+	if percentage >= 70 {
+		return "A"
+	} else if percentage >= 60 && percentage < 70 {
+		return "B"
+	} else if percentage >= 50 && percentage < 60 {
+		return "C"
+	} else if percentage >= 45 && percentage < 50 {
+		return "D"
+	} else if percentage >= 40 && percentage < 45 {
+		return "E"
+	} else {
+		return "F"
+	}
+
+}
+
+func GetPrincipalRemarkFromPercentage(percentage float32) string {
+	if percentage >= 70 {
+		return "A"
+	} else if percentage >= 60 && percentage < 70 {
+		return "B"
+	} else if percentage >= 50 && percentage < 60 {
+		return "C"
+	} else if percentage >= 45 && percentage < 50 {
+		return "D"
+	} else if percentage >= 40 && percentage < 45 {
+		return "E"
+	} else {
+		return "F"
+	}
+
+}
+
+func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
+	requestParams := mux.Vars(r)
+	id, err := strconv.Atoi(requestParams["id"])
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	studentSubcjectClass := models.GetStudentSubjectsClassByStudentID(uint(id))
+	fmt.Println(studentSubcjectClass)
+	// teachers := models.GetAllUserByRole("teacher")
+
+	for _, singleStudentSubjectDetail := range studentSubcjectClass {
+		totalScore := singleStudentSubjectDetail.FirstCA + singleStudentSubjectDetail.SecondCA + singleStudentSubjectDetail.FirstExam
+		grade := GetGradeFromScore(totalScore)
+		remark := GetRemarkFromScore(totalScore)
+		updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark)
+		fmt.Println(updatedStudentSubjectClass)
+	}
+
+	// TODO: So many expensive db calls here
+	studentSubcjectClass = models.GetStudentSubjectsClassByStudentID(uint(id))
+	studentDetails := models.GetSingleStudentById(uint(id))
+
+	println("I got the student details also ", studentDetails)
+
+	var studentTotal float32
+
+	for _, singleStudentSubjectDetail := range studentSubcjectClass {
+		studentTotal += singleStudentSubjectDetail.TotalFirst
+	}
+
+	numberOfSubjectOffered := len(studentSubcjectClass)
+	var studentPercentage float32
+	studentPercentage = studentTotal / float32(len(studentSubcjectClass))
+	totalScoreObtainable := numberOfSubjectOffered * 100
+
+	fmt.Println("The percentage is ", studentPercentage)
+	fmt.Println("The total score obtainable is ", totalScoreObtainable)
+	fmt.Println("The number of subject offered is ", numberOfSubjectOffered)
+
+	files := []string{
+		filepath.Join(templatesDir, "student-grade.html"),
+		filepath.Join(templatesDir, "base.html"),
+	}
+
+	tmpl, err := template.ParseFiles(files...)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// tmpl := template.Must(template.
+	// 	ParseFiles(files...))
+
+	tmpl.Execute(w, &studentSubcjectClass)
 
 }
 

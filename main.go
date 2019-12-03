@@ -23,6 +23,7 @@ func main() {
 	router.HandleFunc("/", controllers.DashboardHandler)
 	router.HandleFunc("/login", controllers.LoginHandler)
 	router.HandleFunc("/register", controllers.RegisterHandler)
+	router.HandleFunc("/logout", controllers.LogoutHandler)
 
 	router.HandleFunc("/add-student", controllers.AddStudentHandler)
 	router.HandleFunc("/add-subject", controllers.AddSubjectHandler)
@@ -34,21 +35,28 @@ func main() {
 	router.HandleFunc("/teachers", controllers.ViewAllTeacherHandler)
 	router.HandleFunc("/classes", controllers.ViewAllClassHandler)
 	router.HandleFunc("/grade", controllers.ViewAllGradeHandler)
+	router.HandleFunc("/result", controllers.ViewResultHandler)
+	router.HandleFunc("/test", controllers.UpdateGradeHandler).Methods("GET", "POST")
+	router.HandleFunc("/your-subject", controllers.ViewYourSubjectHandler)
+	router.HandleFunc("/grade-subject/{id:[0-9]+}", controllers.GradeStudentsHandler)
 
 	// router.HandleFunc("/student/{id}", controllers.ViewSingleStudentHandler).Methods("GET", "POST")
 
 	router.HandleFunc("/student-profile/{id:[0-9]+}", controllers.ViewSingleStudentHandler).Methods("GET", "POST")
+	router.HandleFunc("/student-result/{id:[0-9]+}", controllers.ViewSingleStudentResultHandler).Methods("GET", "POST")
 	router.HandleFunc("/assign-subject/{id:[0-9]+}", controllers.AssignSubjectHandler).Methods("GET", "POST")
 	router.HandleFunc("/update-subject/{id:[0-9]+}", controllers.UpdateSubjectHandler).Methods("GET", "POST")
 
 	// s := http.StripPrefix("/templates/", http.FileServer(http.Dir("./templates/")))
 	// router.PathPrefix("/templates/").Handler(s)
 	// ServeStatic(router, "/templates/")
+	router.PathPrefix("/grade-subject").Handler(http.HandlerFunc(handleJs))
 	router.PathPrefix("/js").Handler(http.HandlerFunc(handleJs))
 	router.PathPrefix("/css").Handler(http.HandlerFunc(handleJs))
 	router.PathPrefix("/img").Handler(http.HandlerFunc(handleJs))
 	router.PathPrefix("/fonts").Handler(http.HandlerFunc(handleJs))
 	router.PathPrefix("/style.css").Handler(http.HandlerFunc(handleJs))
+	router.PathPrefix("/grade-subject").Handler(http.HandlerFunc(handleJs))
 	// router.Handle("/js", http.StripPrefix("/", http.FileServer(http.Dir("templates"))))
 
 	log.Printf("Serving site on port 8000")
@@ -78,12 +86,15 @@ func main() {
 }
 
 func ServeStatic(router *mux.Router, staticDirectory string) {
+	// TODO: Fix this currently does not account for path variables
 	staticPaths := map[string]string{
 		"css":   staticDirectory + "/css/",
 		"fonts": staticDirectory + "/fonts/",
 		"pdf":   staticDirectory + "/pdf/",
 		"img":   staticDirectory + "/img/",
 		"js":    staticDirectory + "/js/",
+
+		"grade-subject": staticDirectory + "/grade-subject/",
 	}
 	for pathName, pathValue := range staticPaths {
 		pathPrefix := "/" + pathName + "/"

@@ -72,6 +72,16 @@ func GetUserByID(id uint) *User {
 	return user
 }
 
+// GetUserByEmail - Get the user object for a given email
+func GetUserByEmail(email string) *User {
+	user := &User{}
+	err := GetDB().Table("users").Where("email = ?", email).First(user).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return user
+}
+
 // Validate incoming user details...
 // func (user *User) Validate() (map[string]interface{}, bool) {
 

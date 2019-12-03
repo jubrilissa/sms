@@ -2,7 +2,8 @@
  "use strict";
  
  //defaults
-   $.fn.editable.defaults.url = '/post'; 
+//    $.fn.editable.defaults.url = '/post'; 
+   $.fn.editable.defaults.url = '/student'; 
 	
     //enable / disable
    $('#enable').on('click', function() {
@@ -24,6 +25,109 @@
 	 
     
     //editables 
+//     $('#firstCA').editable({
+//         validate: function(value) {
+//             if($.trim(value) == '') return 'This field is required';
+//          },
+//         url: '/post',
+//         type: 'text',
+//         pk: 1,
+//         name: 'username',
+//         title: 'Enter username'
+//  });
+
+//  $('#secondCA').editable({
+//     validate: function(value) {
+//         if($.trim(value) == '') return 'This field is required';
+//      },
+//     url: '/post',
+//     type: 'text',
+//     pk: 1,
+//     name: 'username',
+//     title: 'Enter username'
+// });
+// $('#exam').editable({
+//     validate: function(value) {
+//         if($.trim(value) == '') return 'This field is required';
+//      },
+//     url: '/post',
+//     type: 'text',
+//     pk: 1,
+//     name: 'username',
+//     title: 'Enter username'
+// });
+
+// TODO: Anytime this file portion is edited update it in grade-subject js static file
+$('#employee_data').editable({
+    container: 'body',
+    selector: 'td.name',
+    url: "/test",
+    // url: "update.php",
+    title: 'Employee Name',
+    type: "POST",
+    //dataType: 'json',
+    validate: function(value){
+     if($.trim(value) == '')
+     {
+      return 'This field is required';
+     }
+    }
+   });
+   
+   $('#employee_data').editable({
+    container: 'body',
+    selector: 'td.gender',
+    url: "/test",
+    // url: "update.php",
+    title: 'First CA',
+    type: "POST",
+    dataType: 'json',
+    source: [{value: "Male", text: "Male"}, {value: "Female", text: "Female"}],
+    validate: function(value){
+     if($.trim(value) == '')
+     {
+      return 'This field is required';
+     }
+    }
+   });
+   
+   $('#employee_data').editable({
+    container: 'body',
+    selector: 'td.designation',
+    url: "/test",
+    // url: "update.php",
+    title: 'Second CA',
+    type: "POST",
+    dataType: 'json',
+    validate: function(value){
+     if($.trim(value) == '')
+     {
+      return 'This field is required';
+     }
+    }
+   });
+   
+   $('#employee_data').editable({
+    container: 'body',
+    selector: 'td.age',
+    url: "/test",
+    // url: "update.php",
+    title: 'Exam',
+    type: "POST",
+    dataType: 'json',
+    validate: function(value){
+     if($.trim(value) == '')
+     {
+      return 'This field is required';
+     }
+     var regex = /^[0-9]+$/;
+     if(! expression.test(value))
+     {
+      return 'Numbers only!';
+     }
+    }
+   });
+
     $('#username').editable({
            url: '/post',
            type: 'text',

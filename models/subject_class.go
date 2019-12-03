@@ -81,6 +81,28 @@ func UpdateSubjectClassTeacher(id uint, teacher uint) *SubjectClass {
 
 }
 
+func GetSubjectClassForTeacher(teacherID uint) []*SubjectClass {
+
+	subjectClass := make([]*SubjectClass, 0)
+	// db.Preload("Orders", func(db *gorm.DB) *gorm.DB {
+	// 	return db.Order("orders.amount DESC")
+	// }).Find(&users)
+	err := GetDB().Table("subject_classes").Where("user_id = ?", teacherID).Find(&subjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return subjectClass
+}
+
+func GetSubjectClassById(id uint) *SubjectClass {
+	subjectClass := &SubjectClass{}
+	err := GetDB().Table("subject_classes").Where("id = ?", id).First(subjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return subjectClass
+}
+
 // func GetSubjectClassDetails() []*SubjectClass {
 // 	subjectClass := make([]*SubjectClass, 0)
 
