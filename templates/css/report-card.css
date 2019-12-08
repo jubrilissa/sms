@@ -1,0 +1,44 @@
+#current-term-header {
+    text-decoration: underline;
+    text-align: center;
+}
+
+#student-name-underline {
+    text-decoration: underline;
+    margin-right: 20px;
+    font-weight: bold;
+}
+
+#student-gender-underline {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.result-parent-div {
+    margin: auto;
+    width: 800px;
+}
+
+.student-basic-data {
+    text-decoration: underline;
+    font-weight: bold;
+    margin: 20px;
+}
+
+.teacher-remark {
+	border: solid 1px;
+	text-align: center;
+}
+
+/* .student-bio {
+    display: flex;
+    justify-content: space-between;
+} */
+
+.student-image {
+
+}
+
+#perfomance-summary {
+    text-align: center;
+}

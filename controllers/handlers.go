@@ -814,8 +814,10 @@ func GetRemarkFromScore(score float32) string {
 		return "GOOD"
 	} else if score >= 40 && score < 50 {
 		return "PASS"
-	} else {
+	} else if score >= 30 && score < 40 {
 		return "POOR"
+	} else {
+		return "WEAK"
 	}
 }
 
@@ -837,34 +839,30 @@ func GetGradeFromScore(score float32) string {
 
 func GetTeacherRemarkFromPercentage(percentage float32) string {
 	if percentage >= 70 {
-		return "A"
+		return "A splendid result. Increase your academic tempo. The sky is the beginning."
 	} else if percentage >= 60 && percentage < 70 {
-		return "B"
+		return "A good result. Do not relent in your efforts."
 	} else if percentage >= 50 && percentage < 60 {
-		return "C"
-	} else if percentage >= 45 && percentage < 50 {
-		return "D"
-	} else if percentage >= 40 && percentage < 45 {
-		return "E"
+		return "An average result. Work hard and don't be left behind."
+	} else if percentage >= 40 && percentage < 50 {
+		return "Below average is not good for you. Work harder next term."
 	} else {
-		return "F"
+		return "Poor result. Work hard or you will be left behind."
 	}
 
 }
 
 func GetPrincipalRemarkFromPercentage(percentage float32) string {
 	if percentage >= 70 {
-		return "A"
+		return "An excellent performance. keep it up."
 	} else if percentage >= 60 && percentage < 70 {
-		return "B"
+		return "A good perfromance, however, there is still room for improvement next term."
 	} else if percentage >= 50 && percentage < 60 {
-		return "C"
-	} else if percentage >= 45 && percentage < 50 {
-		return "D"
-	} else if percentage >= 40 && percentage < 45 {
-		return "E"
+		return "An average performance. Concentrate more on your weak subjects."
+	} else if percentage >= 40 && percentage < 50 {
+		return "A below average performance. Put in more effort in your academics."
 	} else {
-		return "F"
+		return "A very poor performance. You need to put in extra effort next term."
 	}
 
 }
@@ -875,6 +873,23 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		panic(err.Error())
+	}
+
+	type StudentResultPageData struct {
+		StudentSubjectClass *models.StudentSubjectClass
+		Subject             *models.Subject
+	}
+
+	var StudentSubjectScoreDetails []StudentResultPageData
+
+	type StudentDetaisResultDats struct {
+		Student             *models.Student
+		SubjectScoreDetails []StudentResultPageData
+		TotalObtainable     int
+		StudentPercentage   float32
+		StudentTotalScore   float32
+		TeacherRemarks      string
+		PrincipalRemarks    string
 	}
 
 	studentSubcjectClass := models.GetStudentSubjectsClassByStudentID(uint(id))
@@ -899,6 +914,12 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, singleStudentSubjectDetail := range studentSubcjectClass {
 		studentTotal += singleStudentSubjectDetail.TotalFirst
+		currentSubject := models.GetSubjectBySubjectClassId(singleStudentSubjectDetail.SubjectClassID)
+		fmt.Println("The name of the subject is", currentSubject.Name)
+		StudentSubjectScoreDetails = append(StudentSubjectScoreDetails, StudentResultPageData{
+			StudentSubjectClass: singleStudentSubjectDetail,
+			Subject:             currentSubject,
+		})
 	}
 
 	numberOfSubjectOffered := len(studentSubcjectClass)
@@ -906,25 +927,39 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	studentPercentage = studentTotal / float32(len(studentSubcjectClass))
 	totalScoreObtainable := numberOfSubjectOffered * 100
 
+	principalRemarks := GetPrincipalRemarkFromPercentage(studentPercentage)
+	teacherRemarks := GetTeacherRemarkFromPercentage(studentPercentage)
+
 	fmt.Println("The percentage is ", studentPercentage)
 	fmt.Println("The total score obtainable is ", totalScoreObtainable)
 	fmt.Println("The number of subject offered is ", numberOfSubjectOffered)
 
-	files := []string{
-		filepath.Join(templatesDir, "student-grade.html"),
-		filepath.Join(templatesDir, "base.html"),
+	pVariables := StudentDetaisResultDats{
+		Student:             studentDetails,
+		SubjectScoreDetails: StudentSubjectScoreDetails,
+		TotalObtainable:     totalScoreObtainable,
+		StudentPercentage:   studentPercentage,
+		StudentTotalScore:   studentTotal,
+		PrincipalRemarks:    principalRemarks,
+		TeacherRemarks:      teacherRemarks,
 	}
 
-	tmpl, err := template.ParseFiles(files...)
+	// files := []string{
+	// 	filepath.Join(templatesDir, "student-grade.html"),
+	// 	filepath.Join(templatesDir, "base.html"),
+	// }
 
-	if err != nil {
-		panic(err.Error())
-	}
+	// tmpl, err := template.ParseFiles(files...)
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+
+	tmpl := template.Must(template.ParseFiles("templates/student-grade2.html"))
 
 	// tmpl := template.Must(template.
 	// 	ParseFiles(files...))
 
-	tmpl.Execute(w, &studentSubcjectClass)
+	tmpl.Execute(w, &pVariables)
 
 }
 

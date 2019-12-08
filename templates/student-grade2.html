@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <!-- Bootstrap CSS
+		============================================ -->
+  <link rel="stylesheet" href="/css/bootstrap4.min.css">
+  <!-- Bootstrap CSS
+		============================================ -->
+  <link rel="stylesheet" href="/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="/css/report-card.css">
+</head>
+
+<body>
+  <!-- Static Table Start -->
+  <div class="result-parent-div">
+    <div class="">
+      <div class="">
+        <div class="">
+          <div class="">
+            <div class="">
+              <div class="">
+
+
+
+
+                <h3 id="current-term-header">FIRST TERM STUDENT'S PERFORMANCE REPORT</h3>
+
+                <div class="d-flex justify-content-between bd-highlight mb-3">
+
+                  <div class="p-2 bd-highlight">
+                    <div>
+
+                      NAME: <span id="student-name-underline">{{.Student.Name}}</span>
+                      GENDER: <span id="student-gender-underline">{{.Student.Gender}}</span>
+                    </div>
+                    <div>
+                      CLASS: <span class="student-basic-data">{{.Student.ClassText}}</span>
+                      SESSION: <span class="student-basic-data">2019/2020</span>
+                      
+                    </div>
+                    <div>
+                      <table class="table table-bordered">
+                        <thead class="thead-light">
+                          <tr>
+                            <th colspan="5" id="perfomance-summary">PERFORMANCE SUMMARY</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Total Obtained:</td>
+                            <td>{{.StudentTotalScore}}</td>
+                            <td>PERCENTAGE</td>
+                            <td>{{.StudentPercentage}}</td>
+                            <td rowspan="2">
+                              <!-- TODO: Send grade remark from backend -->
+                              EXCELLENT
+                            </td>
+                          </tr>
+                          <tr>
+                              <td>Total Obtainable:</td>
+                              <td>{{.TotalObtainable}}</td>
+                              <td>GRADE</td>
+                              <!-- TODO: Send grade from percentage from the backend -->
+                              <td>{{.StudentPercentage}}</td>
+                            </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+
+                  </div>
+                  <div class="p-2 bd-highlight">
+                    <img src="/img/student-modified/testimage.jpg" alt="" />
+                  </div>
+
+                  <div>
+
+                  </div>
+
+
+                </div>
+
+              </div>
+            </div>
+            <div class="">
+
+              <table class="table table-bordered">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">SUBJECTS</th>
+                    <th scope="col">FIRST CA</th>
+                    <th scope="col">SECOND CA</th>
+                    <th scope="col">EXAM</th>
+                    <th scope="col">TOTAL</th>
+                    <th scope="col">GRADE</th>
+                    <th scope="col">REMARKS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{ range  $index, $value := .SubjectScoreDetails}}
+                  <tr>
+                    <!-- <th scope="row">1</th> -->
+                    <td>{{.Subject.Name}}</td>
+                    <!-- <td><a href="#" id="username" data-type="text" data-pk="1" data-title="Enter username">superuser</a></td> -->
+                    <td>{{.StudentSubjectClass.FirstCA}}</td>
+                    <td>{{.StudentSubjectClass.SecondCA}}</td>
+                    <td>{{.StudentSubjectClass.FirstExam}}</td>
+                    <td>{{.StudentSubjectClass.TotalFirst}}</td>
+                    <td>{{.StudentSubjectClass.GradeFirst}}</td>
+                    <td>{{.StudentSubjectClass.RemarkFirst}}</td>
+                  </tr>
+                  {{end}}
+
+                </tbody>
+              </table>
+
+
+            </div>
+            <div>
+
+            </div>
+            Teacher's Remark
+            <div class="teacher-remark">
+              {{.TeacherRemarks}}
+            </div>
+            <div>
+              Teacher's Name: MR Rasaq Ahmed
+            </div>
+
+          </div>
+          Principal's Remark
+          <div class="teacher-remark">
+            {{.PrincipalRemarks}}
+          </div>
+          <div>
+            Principal's Name: MR Rasaq Ahmed
+          </div>
+
+          <a href="/teacher">teacher</a>
+          <a href="/students">students</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</body>
+
+</html>
