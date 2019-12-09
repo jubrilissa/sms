@@ -27,9 +27,9 @@
               <div class="">
 
                 <div>
-                    <img src="/img/student-modified/logo.jpg" alt="" />
+                  <img src="/img/student-modified/logo.jpg" alt="" />
                 </div>
-                  
+
 
 
                 <h3 id="current-term-header">FIRST TERM STUDENT'S PERFORMANCE REPORT</h3>
@@ -45,9 +45,9 @@
                     <div>
                       CLASS: <span class="student-basic-data">{{.Student.ClassText}}</span>
                       SESSION: <span class="student-basic-data">2019/2020</span>
-                      
+
                     </div>
-                    <div>
+                    <div class="performance-summary-table">
                       <table class="table table-bordered">
                         <thead class="thead-light">
                           <tr>
@@ -66,12 +66,12 @@
                             </td>
                           </tr>
                           <tr>
-                              <td>Total Obtainable:</td>
-                              <td>{{.TotalObtainable}}</td>
-                              <td>GRADE</td>
-                              <!-- TODO: Send grade from percentage from the backend -->
-                              <td>{{.OverallGradeFromPercentage}}</td>
-                            </tr>
+                            <td>Total Obtainable:</td>
+                            <td>{{.TotalObtainable}}</td>
+                            <td>GRADE</td>
+                            <!-- TODO: Send grade from percentage from the backend -->
+                            <td>{{.OverallGradeFromPercentage}}</td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
@@ -130,23 +130,23 @@
             <div>
 
             </div>
-            Teacher's Remark
-            <div class="teacher-remark">
-              {{.TeacherRemarks}}
+            <div class="teacher-remark-section">
+              Teacher's Remark
+              <div class="teacher-remark">
+                {{.TeacherRemarks}}
+              </div>
             </div>
-            
+
           </div>
           Principal's Remark
           <div class="teacher-remark">
             {{.PrincipalRemarks}}
           </div>
-          
-          <div>
-            Next Term Begins: <span class="resumption-date">Isere</span>
+
+          <div class="resumption-section">
+            Next Term Begins: <span class="resumption-date">Mon, 06-January-2020</span>
           </div>
 
-          <a href="/teacher">teacher</a>
-          <a href="/students">students</a>
         </div>
       </div>
     </div>
