@@ -26,7 +26,10 @@
             <div class="">
               <div class="">
 
-
+                <div>
+                    <img src="/img/student-modified/logo.jpg" alt="" />
+                </div>
+                  
 
 
                 <h3 id="current-term-header">FIRST TERM STUDENT'S PERFORMANCE REPORT</h3>
@@ -76,7 +79,9 @@
 
                   </div>
                   <div class="p-2 bd-highlight">
-                    <img src="/img/student-modified/testimage.jpg" alt="" />
+                    <!-- <img src="/img/student-modified/testimage.jpg" alt="" /> -->
+                    <!-- <img src="/img/student-modified/Paul_j[1].jpg" alt="" /> -->
+                    <img src="/img/student-modified/{{.Student.Image}}" alt="" />
                   </div>
 
                   <div>
@@ -129,17 +134,15 @@
             <div class="teacher-remark">
               {{.TeacherRemarks}}
             </div>
-            <div>
-              Teacher's Name: MR Rasaq Ahmed
-            </div>
-
+            
           </div>
           Principal's Remark
           <div class="teacher-remark">
             {{.PrincipalRemarks}}
           </div>
+          
           <div>
-            Principal's Name: MR Rasaq Ahmed
+            Next Term Begins: <span class="resumption-date">Isere</span>
           </div>
 
           <a href="/teacher">teacher</a>

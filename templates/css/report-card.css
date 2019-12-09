@@ -35,10 +35,14 @@
     justify-content: space-between;
 } */
 
-.student-image {
+/* .student-image {
 
-}
+} */
 
 #perfomance-summary {
     text-align: center;
+}
+
+.resumption-date {
+    border-bottom: 1px solid;
 }
