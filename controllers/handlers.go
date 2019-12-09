@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -804,7 +805,7 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetRemarkFromScore(score float32) string {
+func GetRemarkFromScore(score float64) string {
 	// TODO: Update this condition
 	if score >= 70 {
 		return "EXCELLENT"
@@ -821,7 +822,7 @@ func GetRemarkFromScore(score float32) string {
 	}
 }
 
-func GetGradeFromScore(score float32) string {
+func GetGradeFromScore(score float64) string {
 	if score >= 70 {
 		return "A"
 	} else if score >= 60 && score < 70 {
@@ -837,7 +838,7 @@ func GetGradeFromScore(score float32) string {
 	}
 }
 
-func GetTeacherRemarkFromPercentage(percentage float32) string {
+func GetTeacherRemarkFromPercentage(percentage float64) string {
 	if percentage >= 70 {
 		return "A splendid result. Increase your academic tempo. The sky is the beginning."
 	} else if percentage >= 60 && percentage < 70 {
@@ -852,7 +853,7 @@ func GetTeacherRemarkFromPercentage(percentage float32) string {
 
 }
 
-func GetPrincipalRemarkFromPercentage(percentage float32) string {
+func GetPrincipalRemarkFromPercentage(percentage float64) string {
 	if percentage >= 70 {
 		return "An excellent performance. keep it up."
 	} else if percentage >= 60 && percentage < 70 {
@@ -883,13 +884,15 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	var StudentSubjectScoreDetails []StudentResultPageData
 
 	type StudentDetaisResultDats struct {
-		Student             *models.Student
-		SubjectScoreDetails []StudentResultPageData
-		TotalObtainable     int
-		StudentPercentage   float32
-		StudentTotalScore   float32
-		TeacherRemarks      string
-		PrincipalRemarks    string
+		Student                     *models.Student
+		SubjectScoreDetails         []StudentResultPageData
+		TotalObtainable             int
+		StudentPercentage           float64
+		StudentTotalScore           float32
+		TeacherRemarks              string
+		PrincipalRemarks            string
+		OverallRemarkFromPercentage string
+		OverallGradeFromPercentage  string
 	}
 
 	studentSubcjectClass := models.GetStudentSubjectsClassByStudentID(uint(id))
@@ -898,8 +901,8 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, singleStudentSubjectDetail := range studentSubcjectClass {
 		totalScore := singleStudentSubjectDetail.FirstCA + singleStudentSubjectDetail.SecondCA + singleStudentSubjectDetail.FirstExam
-		grade := GetGradeFromScore(totalScore)
-		remark := GetRemarkFromScore(totalScore)
+		grade := GetGradeFromScore(float64(totalScore))
+		remark := GetRemarkFromScore(float64(totalScore))
 		updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark)
 		fmt.Println(updatedStudentSubjectClass)
 	}
@@ -923,8 +926,10 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	numberOfSubjectOffered := len(studentSubcjectClass)
-	var studentPercentage float32
-	studentPercentage = studentTotal / float32(len(studentSubcjectClass))
+	var studentPercentage float64
+	studentPercentage = float64(studentTotal) / float64(len(studentSubcjectClass))
+
+	studentPercentage = math.Round(studentPercentage*10) / 10
 	totalScoreObtainable := numberOfSubjectOffered * 100
 
 	principalRemarks := GetPrincipalRemarkFromPercentage(studentPercentage)
@@ -935,13 +940,15 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("The number of subject offered is ", numberOfSubjectOffered)
 
 	pVariables := StudentDetaisResultDats{
-		Student:             studentDetails,
-		SubjectScoreDetails: StudentSubjectScoreDetails,
-		TotalObtainable:     totalScoreObtainable,
-		StudentPercentage:   studentPercentage,
-		StudentTotalScore:   studentTotal,
-		PrincipalRemarks:    principalRemarks,
-		TeacherRemarks:      teacherRemarks,
+		Student:                     studentDetails,
+		SubjectScoreDetails:         StudentSubjectScoreDetails,
+		TotalObtainable:             totalScoreObtainable,
+		StudentPercentage:           studentPercentage,
+		StudentTotalScore:           studentTotal,
+		PrincipalRemarks:            principalRemarks,
+		TeacherRemarks:              teacherRemarks,
+		OverallRemarkFromPercentage: GetRemarkFromScore(studentPercentage),
+		OverallGradeFromPercentage:  GetGradeFromScore(studentPercentage),
 	}
 
 	// files := []string{
