@@ -82,3 +82,8 @@
     font-weight: bold;
     font-size: small;
 }
+
+#overall-remark {
+    text-align: center;
+    vertical-align: middle ;
+}
