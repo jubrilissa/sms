@@ -86,4 +86,10 @@
 #overall-remark {
     text-align: center;
     vertical-align: middle ;
+    font-weight: bold;
+}
+
+
+.bolded-text {
+    font-weight: bold;
 }

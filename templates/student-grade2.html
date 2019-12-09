@@ -57,9 +57,9 @@
                         <tbody>
                           <tr>
                             <td>Total Obtained:</td>
-                            <td>{{.StudentTotalScore}}</td>
+                            <td class="bolded-text">{{.StudentTotalScore}}</td>
                             <td>PERCENTAGE</td>
-                            <td>{{.StudentPercentage}}</td>
+                            <td class="bolded-text">{{.StudentPercentage}}%</td>
                             <td rowspan="2" id="overall-remark">
                               <!-- TODO: Send grade remark from backend -->
                               {{.OverallRemarkFromPercentage}}
@@ -67,10 +67,10 @@
                           </tr>
                           <tr>
                             <td>Total Obtainable:</td>
-                            <td>{{.TotalObtainable}}</td>
+                            <td class="bolded-text">{{.TotalObtainable}}</td>
                             <td>GRADE</td>
                             <!-- TODO: Send grade from percentage from the backend -->
-                            <td>{{.OverallGradeFromPercentage}}</td>
+                            <td class="bolded-text">{{.OverallGradeFromPercentage}}</td>
                           </tr>
                         </tbody>
                       </table>
