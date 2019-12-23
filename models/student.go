@@ -21,8 +21,15 @@ type Student struct {
 	Image     string
 	Gender    string
 	// TODO: Should note not be somethinglike text
-	Notes       string
-	DateOfBirth *time.Time
+	Notes             string
+	DateOfBirth       *time.Time
+	OutstandingDebt   float64
+	FirstTermFees     float64
+	SecondTermFees    float64
+	ThirdTermFees     float64
+	FirstTermPayment  float64
+	SecondTermPayment float64
+	ThirdTermPayment  float64
 }
 
 // Create a user object
