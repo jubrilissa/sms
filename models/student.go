@@ -21,15 +21,20 @@ type Student struct {
 	Image     string
 	Gender    string
 	// TODO: Should note not be somethinglike text
-	Notes             string
-	DateOfBirth       *time.Time
-	OutstandingDebt   float64
-	FirstTermFees     float64
-	SecondTermFees    float64
-	ThirdTermFees     float64
-	FirstTermPayment  float64
-	SecondTermPayment float64
-	ThirdTermPayment  float64
+	Notes              string
+	DateOfBirth        *time.Time
+	OutstandingDebt    float64
+	IsFeeCompleted     bool
+	PresentTermBalance float64
+	PresentTermFees    float64
+	PresentTermPayment float64
+	// FirstTermFees      float64
+	// SecondTermFees     float64
+	// ThirdTermFees      float64
+	// FirstTermPayment   float64
+	// SecondTermPayment  float64
+	// ThirdTermPayment   float64
+	// TODO: Change all the fees stuff to present term fee
 }
 
 // Create a user object
@@ -66,6 +71,8 @@ func (student *Student) Create() uint {
 
 }
 
+// GetAllStudents - Return all the students present in the platfrom
+// This is done with the assumption that this is not an expensive process
 func GetAllStudents() []*Student {
 	students := make([]*Student, 0)
 
@@ -76,7 +83,6 @@ func GetAllStudents() []*Student {
 	}
 
 	return students
-
 }
 
 func GetSingleStudentById(id uint) *Student {
@@ -121,3 +127,20 @@ func GetSubjectsClassForStudentByID2(id uint) []*Subject {
 
 // 	return subjects
 // }
+
+func GetTotalAmountOwed() float64 {
+
+	var sum float64
+	// TODO: The current term should be captured well
+	GetDB().Table("students").Select("sum( outstanding_debt + second_term_fees)").Row().Scan(&sum)
+	return sum
+
+}
+
+func GetNoOfStudentInSchool() int64 {
+
+	var count int64
+
+	GetDB().Model(&Student{}).Count(&count)
+	return count
+}
