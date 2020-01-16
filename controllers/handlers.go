@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"sms-webapp/models"
+	"sms-webapp/utils"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
@@ -137,6 +138,36 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//AuthRequired is a middleware which will be used for each httpHandler to check if there is any active session
+func AuthRequired(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "cookie-name")
+		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+			http.Redirect(w, r, "/login", 302)
+			return
+		}
+		handler(w, r)
+	}
+}
+
+//PrincipalRoleRequired is a middleware which will be used for each httpHandler to check if there is any active session
+func PrincipalRoleRequired(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "cookie-name")
+		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+			http.Redirect(w, r, "/login", 302)
+			return
+		}
+		currentUser := getUser(session)
+
+		if currentUser.Role != "principal" {
+			http.Redirect(w, r, "/your-subject", 302)
+			return
+		}
+		handler(w, r)
+	}
+}
+
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := store.Get(r, "cookie-name")
 	if err != nil {
@@ -160,21 +191,34 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	// tmpl := template.Must(template.ParseFiles("templates/index.html"))
 
 	// TODO: Uncomment the following below before deployment
-	session, _ := store.Get(r, "cookie-name")
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		// http.Error(w, "Forbidden", http.StatusForbidden)
-		return
+	// session, _ := store.Get(r, "cookie-name")
+	// if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+	// 	http.Redirect(w, r, "/login", http.StatusFound)
+	// 	// http.Error(w, "Forbidden", http.StatusForbidden)
+	// 	return
+	// }
+
+	// currentUser := getUser(session)
+
+	// if currentUser.Role != "principal" {
+	// 	// TODO: This should ideally move to the forbidden page
+	// 	http.Redirect(w, r, "/login", http.StatusFound)
+	// 	// http.Error(w, "Forbidden", http.StatusForbidden)
+	// 	return
+	// }
+
+	type DashboardVariables struct {
+		AmountOwed              float64
+		NumberOfStudentInSchool int64
+		AmountRealizedToday     float64
+		AmountReaizedPastWeek   float64
 	}
 
-	currentUser := getUser(session)
+	amountOWED := models.GetTotalAmountOwed()
+	fmt.Println("Amount owed is ", amountOWED)
 
-	if currentUser.Role != "principal" {
-		// TODO: This should ideally move to the forbidden page
-		http.Redirect(w, r, "/login", http.StatusFound)
-		// http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
+	noOfStudentsInSchool := models.GetNoOfStudentInSchool()
+	fmt.Println("The number of student in school is ", noOfStudentsInSchool)
 
 	files := []string{
 		filepath.Join(templatesDir, "index.html"),
@@ -346,14 +390,26 @@ func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func ViewYourSubjectHandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		// http.Error(w, "Forbidden", http.StatusForbidden)
-		return
+func ViewAllFeesHandler(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("method:", r.Method) //get request method
+	if r.Method == "GET" {
+		data := models.GetAllStudents()
+		files := []string{
+			filepath.Join(templatesDir, "all-fees-details.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		tmpl := template.Must(template.
+			ParseFiles(files...))
+
+		tmpl.Execute(w, &data)
 	}
 
+}
+
+func ViewYourSubjectHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
 	currentUser := getUser(session)
 
 	fmt.Println("method: ", r.Method)
@@ -499,13 +555,6 @@ func GradeStudentsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: Fix the hack for loading static files for path variables
 	session, _ := store.Get(r, "cookie-name")
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		// TODO: Think through how unauthorized users should be handled
-		http.Redirect(w, r, "/login", http.StatusFound)
-		// http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-
 	currentUser := getUser(session)
 
 	requestParams := mux.Vars(r)
@@ -805,6 +854,101 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func PrintReceiptForStudnet(w http.ResponseWriter, r *http.Request) {
+
+	type ReceiptStruct struct {
+		Payment        *models.FeesPayment
+		Student        *models.Student
+		AmountInString string
+		CurrentDate    string
+		BalancePayment float64
+	}
+
+	requestParams := mux.Vars(r)
+	id, err := strconv.Atoi(requestParams["id"])
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	feePaid := models.GetFeePaidById(uint(id))
+
+	amountInString := utils.Num2words(int(feePaid.Amount))
+	fmt.Println(amountInString)
+
+	student := models.GetSingleStudentById(feePaid.StudentID)
+
+	currentTime := time.Now()
+	receiptPageVariable := ReceiptStruct{
+		Payment:        feePaid,
+		Student:        student,
+		AmountInString: amountInString,
+		CurrentDate:    currentTime.Format("02/01/2006"),
+	}
+
+	// fmt.Println("Current Time in String: ", currentTime.String())
+	// fmt.Println("MM-DD-YYYY : ", currentTime.Format("01-02-2006"))
+	// fmt.Println("DD|MM|YYYY : ", currentTime.Format("02|01|2006"))
+
+	files := []string{
+		filepath.Join(templatesDir, "student-receipt.html"),
+		filepath.Join(templatesDir, "base.html"),
+	}
+
+	tmpl, err := template.ParseFiles(files...)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	tmpl.Execute(w, &receiptPageVariable)
+
+}
+
+func UpdateOutstandingDebt(w http.ResponseWriter, r *http.Request) {
+
+	// GetAllSubjectsDetails
+	fmt.Println("method: ", r.Method)
+	if r.Method == "GET" {
+
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		student := models.GetSingleStudentById(uint(id))
+
+		files := []string{
+			filepath.Join(templatesDir, "student-outstanding-debt.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		tmpl := template.Must(template.
+			ParseFiles(files...))
+
+		tmpl.Execute(w, student)
+	} else {
+
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		student := models.GetSingleStudentById(uint(id))
+		oustandingDebtStr := r.FormValue("amount")
+		outstandingDebt, _ := strconv.ParseFloat(oustandingDebtStr, 64)
+		student.OutstandingDebt = outstandingDebt
+
+		models.GetDB().Save(&student)
+
+		http.Redirect(w, r, "/fees", http.StatusFound)
+	}
+
+}
 func GetRemarkFromScore(score float64) string {
 	// TODO: Update this condition
 	if score >= 70 {
@@ -962,6 +1106,10 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	tmpl := template.Must(template.ParseFiles("templates/student-grade2.html"))
+	// tmpl := template.Must(template.ParseFiles("templates/student-grade_uthman.html"))
+	// tmpl := template.Must(template.ParseFiles("templates/student-grade_misturah.html"))
+	// tmpl := template.Must(template.ParseFiles("templates/student-grade_ama.html"))
+	// tmpl := template.Must(template.ParseFiles("templates/student-grade_bashirudeen.html"))
 
 	// tmpl := template.Must(template.
 	// 	ParseFiles(files...))
@@ -992,6 +1140,7 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 		type PageVariables struct {
 			Student *models.Student
 			Subject []*models.Subject
+			Payment []*models.FeesPayment
 			// SubjectClass []*models.SubjectClass
 		}
 
@@ -1003,11 +1152,11 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		student := models.GetSingleStudentById(uint(id))
 
+		fees_payment := models.GetPaymentsForStudent(uint(id))
+
 		fmt.Println("The class is ", student.ClassText)
 
 		classSubject := models.GetSubjectsClassForStudentByID(uint(id))
-
-		fmt.Println("The class subject is ", classSubject)
 
 		StudentSubjects := make([]*models.Subject, 0)
 		for _, singleClassSubject := range classSubject {
@@ -1030,7 +1179,7 @@ func ViewSingleStudentHandler(w http.ResponseWriter, r *http.Request) {
 
 		// fmt.Println(classSubject)
 
-		pVariables := PageVariables{Student: student, Subject: StudentSubjects}
+		pVariables := PageVariables{Student: student, Subject: StudentSubjects, Payment: fees_payment}
 		// pVariables := PageVariables{Student: student, SubjectClass: classSubject}
 
 		fmt.Println("The page variables are ", pVariables)
@@ -1206,4 +1355,79 @@ func AddStudentHandler(w http.ResponseWriter, r *http.Request) {
 		ParseFiles(files...))
 
 	tmpl.Execute(w, nil)
+}
+
+func StudentPaymentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+		student := models.GetSingleStudentById(uint(id))
+
+		files := []string{
+			filepath.Join(templatesDir, "student-payment.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		tmpl := template.Must(template.
+			ParseFiles(files...))
+
+		tmpl.Execute(w, student)
+
+	} else {
+		session, _ := store.Get(r, "cookie-name")
+		// if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		// 	http.Redirect(w, r, "/login", http.StatusFound)
+		// 	// http.Error(w, "Forbidden", http.StatusForbidden)
+		// 	return
+		// }
+
+		currentUser := getUser(session)
+
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+		// UpdateStudentSubject
+		student := models.GetSingleStudentById(uint(id))
+		amountPaidStr := r.FormValue("amount")
+		amountPaid, _ := strconv.ParseFloat(amountPaidStr, 64)
+		outstandingDebt := student.OutstandingDebt
+		IsFeeCompleted := false
+
+		if amountPaid-outstandingDebt < 0 {
+			student.OutstandingDebt = outstandingDebt - amountPaid
+		} else if amountPaid-outstandingDebt > 0 {
+			student.OutstandingDebt = 0
+			currenTermPayment := student.PresentTermPayment + amountPaid - outstandingDebt
+			student.PresentTermPayment = currenTermPayment
+			student.PresentTermBalance = student.PresentTermFees - currenTermPayment
+			// student.PresentTermBalance =
+			if currenTermPayment >= student.PresentTermFees {
+				IsFeeCompleted = true
+				student.IsFeeCompleted = IsFeeCompleted
+			}
+
+		} else {
+			// This definitely means payment made was just to clear the outstanding
+			student.OutstandingDebt = 0
+		}
+		// studentModel := &models.Student{}
+		// models.GetDB().Model(&studentModel).Updates(student)
+		models.GetDB().Save(&student)
+
+		feesPayment := &models.FeesPayment{}
+		feesPayment.StudentID = student.ID
+		feesPayment.Amount = amountPaid
+		feesPayment.UserID = currentUser.ID
+		feesPayment.IsComplete = IsFeeCompleted
+		feesPayment.Create()
+		http.Redirect(w, r, "/fees", http.StatusFound)
+	}
+
 }

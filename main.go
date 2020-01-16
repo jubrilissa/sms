@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"sms-webapp/controllers"
+
+	"github.com/gorilla/handlers"
 
 	"github.com/gorilla/mux"
 )
@@ -30,26 +33,33 @@ func main() {
 	router.HandleFunc("/add-teacher", controllers.AddTeacherHandler)
 	router.HandleFunc("/add-class", controllers.AddClassHandler).Methods("GET", "POST")
 
+	router.HandleFunc("/fees", controllers.PrincipalRoleRequired(controllers.ViewAllFeesHandler))
 	router.HandleFunc("/students", controllers.ViewAllStudentHandler)
 	router.HandleFunc("/subjects", controllers.ViewAllSubjectHandler)
 	router.HandleFunc("/teachers", controllers.ViewAllTeacherHandler)
 	router.HandleFunc("/classes", controllers.ViewAllClassHandler)
 	router.HandleFunc("/grade", controllers.ViewAllGradeHandler)
 	router.HandleFunc("/result", controllers.ViewResultHandler)
+	// TODO: Send with credentials
 	router.HandleFunc("/test", controllers.UpdateGradeHandler).Methods("GET", "POST")
-	router.HandleFunc("/your-subject", controllers.ViewYourSubjectHandler)
-	router.HandleFunc("/grade-subject/{id:[0-9]+}", controllers.GradeStudentsHandler)
+	router.HandleFunc("/your-subject", controllers.AuthRequired(controllers.ViewYourSubjectHandler))
+	router.HandleFunc("/grade-subject/{id:[0-9]+}", controllers.AuthRequired(controllers.GradeStudentsHandler))
 
 	// router.HandleFunc("/student/{id}", controllers.ViewSingleStudentHandler).Methods("GET", "POST")
 
+	router.HandleFunc("/student-payment/{id:[0-9]+}", controllers.StudentPaymentHandler).Methods("GET", "POST")
 	router.HandleFunc("/student-profile/{id:[0-9]+}", controllers.ViewSingleStudentHandler).Methods("GET", "POST")
 	router.HandleFunc("/student-result/{id:[0-9]+}", controllers.ViewSingleStudentResultHandler).Methods("GET", "POST")
 	router.HandleFunc("/assign-subject/{id:[0-9]+}", controllers.AssignSubjectHandler).Methods("GET", "POST")
 	router.HandleFunc("/update-subject/{id:[0-9]+}", controllers.UpdateSubjectHandler).Methods("GET", "POST")
+	router.HandleFunc("/outstanding-debt/{id:[0-9]+}", controllers.PrincipalRoleRequired(controllers.UpdateOutstandingDebt)).Methods("GET", "POST")
+	router.HandleFunc("/print-receipt/{id:[0-9]+}", controllers.PrincipalRoleRequired(controllers.PrintReceiptForStudnet)).Methods("GET", "POST")
 
 	// s := http.StripPrefix("/templates/", http.FileServer(http.Dir("./templates/")))
 	// router.PathPrefix("/templates/").Handler(s)
 	// ServeStatic(router, "/templates/")
+	router.PathPrefix("/").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("static/"))))
+	// router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	router.PathPrefix("/grade-subject").Handler(http.HandlerFunc(handleJs))
 	router.PathPrefix("/js").Handler(http.HandlerFunc(handleJs))
 	router.PathPrefix("/css").Handler(http.HandlerFunc(handleJs))
@@ -60,7 +70,8 @@ func main() {
 	// router.Handle("/js", http.StripPrefix("/", http.FileServer(http.Dir("templates"))))
 
 	log.Printf("Serving site on port 8000")
-	http.ListenAndServe(":8000", router)
+	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
+	http.ListenAndServe(":8000", loggedRouter)
 
 	// var dir = flag.String("dir", "../sms-frontend", "directory to serve")     // using
 	// var listen = flag.String("listen", "localhost:8000", "Port to listen on") // using
