@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <!-- Bootstrap CSS
+		============================================ -->
+  <link rel="stylesheet" href="/static/css/bootstrap4.min.css">
+  <!-- Bootstrap CSS
+		============================================ -->
+  <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="/static/css/student-receipt.css">
+</head>
+
+<body>
+  <!-- Static Table Start -->
+  <div class="result-parent-div">
+    <div class="">
+      <div class="">
+        <div class="">
+          <div class="">
+            <div class="">
+              <div class="">
+
+                <div id="receipt-logo">
+                  <img src="/static/img/student-modified/logo.jpg" alt="" />
+                </div>
+
+
+
+
+                <h3 id="current-term-header">SCHOOL FEES RECEIPT</h3>
+
+                <div class="d-flex justify-content-between bd-highlight mb-3">
+
+                  <div class="p-2 bd-highlight">
+                      <div>
+                          Date: <span id="student-name-underline">{{.CurrentDate}}</span>
+                      </div>
+                      <div>
+                        Received From: <span id="student-name-underline">{{.Student.Name}}</span>
+                      </div>
+                      <div>
+                        Being payment for:  <span id="student-name-underline">Second term full payment</span>
+                      </div>
+                      <div>
+                        <span id="amount-section">
+                          #{{.Payment.Amount}}
+                        </span>
+                        <span>
+
+                        </span>
+                      </div>
+                    <div>
+
+                      The sum of: <span>{{.AmountInString}} naira</span>
+                      GENDER: <span id="student-gender-underline">{{.Student.Gender}}</span>
+                    </div>
+                    <div>
+                      CLASS: <span class="student-basic-data">{{.Student.ClassText}}</span>
+                      SESSION: <span class="student-basic-data">2019/2020</span>
+                      AMOUNT: {{.Payment.Amount}}
+
+
+                    </div>
+                    
+
+
+                  </div>
+                  
+
+                  <div>
+
+                  </div>
+
+
+                </div>
+
+              </div>
+            </div>
+          
+            <div>
+
+            </div>
+            <div class="teacher-remark-section">
+              Teacher's Remark
+              <div class="teacher-remark">
+                {{.TeacherRemarks}}
+              </div>
+            </div>
+
+          </div>
+          Principal's Remark
+          <div class="teacher-remark">
+            {{.PrincipalRemarks}}
+          </div>
+
+          <div class="resumption-section">
+            Next Term Begins: <span class="resumption-date">Mon, 06-January-2020</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</body>
+
+</html>
