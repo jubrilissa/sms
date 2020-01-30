@@ -132,9 +132,17 @@ func GetTotalAmountOwed() float64 {
 
 	var sum float64
 	// TODO: The current term should be captured well
-	GetDB().Table("students").Select("sum( outstanding_debt + second_term_fees)").Row().Scan(&sum)
+	GetDB().Table("students").Select("sum( outstanding_debt + present_term_fees)").Row().Scan(&sum)
 	return sum
 
+}
+
+func GetAmountPaidInCurrentTerm() float64 {
+
+	var sum float64
+	// TODO: The current term should be captured well
+	GetDB().Table("students").Select("sum(present_term_payment)").Row().Scan(&sum)
+	return sum
 }
 
 func GetNoOfStudentInSchool() int64 {
