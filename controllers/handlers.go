@@ -212,6 +212,7 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 		NumberOfStudentInSchool int64
 		AmountRealizedToday     float64
 		AmountReaizedPastWeek   float64
+		AmountRealizedThisTerm  float64
 	}
 
 	amountOWED := models.GetTotalAmountOwed()
@@ -219,6 +220,14 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 
 	noOfStudentsInSchool := models.GetNoOfStudentInSchool()
 	fmt.Println("The number of student in school is ", noOfStudentsInSchool)
+
+	amountRealizedInCurrentTerm := models.GetAmountPaidInCurrentTerm()
+
+	dashboardPagevariable := DashboardVariables{
+		AmountOwed:              amountOWED,
+		NumberOfStudentInSchool: noOfStudentsInSchool,
+		AmountRealizedThisTerm:  amountRealizedInCurrentTerm,
+	}
 
 	files := []string{
 		filepath.Join(templatesDir, "index.html"),
@@ -233,7 +242,7 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.
 		ParseFiles(files...))
 
-	tmpl.Execute(w, nil)
+	tmpl.Execute(w, &dashboardPagevariable)
 }
 
 func ViewAllTeacherHandler(w http.ResponseWriter, r *http.Request) {
@@ -857,11 +866,11 @@ func UpdateSubjectHandler(w http.ResponseWriter, r *http.Request) {
 func PrintReceiptForStudnet(w http.ResponseWriter, r *http.Request) {
 
 	type ReceiptStruct struct {
-		Payment        *models.FeesPayment
-		Student        *models.Student
-		AmountInString string
-		CurrentDate    string
-		BalancePayment float64
+		Payment         *models.FeesPayment
+		Student         *models.Student
+		AmountInString  string
+		CurrentDate     string
+		BeingPaymentFor string
 	}
 
 	requestParams := mux.Vars(r)
@@ -878,12 +887,24 @@ func PrintReceiptForStudnet(w http.ResponseWriter, r *http.Request) {
 
 	student := models.GetSingleStudentById(feePaid.StudentID)
 
+	beingPaymentString := ""
+	if student.PresentTermBalance > 0 {
+		// FIXME: This should ideally pick the name of the current term.
+		// FIXME: This would be updated every term
+		// FIXME: Also consider the string to return for outstanding debt
+
+		beingPaymentString = "Second term part payment"
+	} else {
+		beingPaymentString = "Second term full payment"
+	}
+
 	currentTime := time.Now()
 	receiptPageVariable := ReceiptStruct{
-		Payment:        feePaid,
-		Student:        student,
-		AmountInString: amountInString,
-		CurrentDate:    currentTime.Format("02/01/2006"),
+		Payment:         feePaid,
+		Student:         student,
+		AmountInString:  amountInString,
+		CurrentDate:     currentTime.Format("02/01/2006"),
+		BeingPaymentFor: beingPaymentString,
 	}
 
 	// fmt.Println("Current Time in String: ", currentTime.String())
