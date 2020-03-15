@@ -11,13 +11,19 @@ type StudentSubjectClass struct {
 	StudentID      uint
 	SubjectClassID uint
 	// TODO: Not really a todo. just setting this here because it should come in handy and we don't want to delete past records
-	IsActive    bool
-	FirstCA     float32
-	SecondCA    float32
-	FirstExam   float32
-	TotalFirst  float32
-	GradeFirst  string
-	RemarkFirst string
+	IsActive     bool
+	FirstCA      float32
+	SecondCA     float32
+	FirstExam    float32
+	TotalFirst   float32
+	GradeFirst   string
+	RemarkFirst  string
+	SFirstCA     float32
+	SSecondCA    float32
+	SecondExam   float32
+	TotalSecond  float32
+	GradeSecond  string
+	RemarkSecond string
 }
 
 func (studentSubjectClass *StudentSubjectClass) Create() {
@@ -95,4 +101,45 @@ func UpdateStudentSubject(id uint, total float32, grade string, remark string) *
 		})
 	return studentSubjectClass
 
+}
+
+type SubjectListRow struct {
+	Name        string
+	FirstCA     float64
+	SecondCA    float64
+	FirstExam   float64
+	TotalFirst  float64
+	GradeFirst  string
+	RemarkFirst string
+}
+
+// GetStudentSubjectListRowBytID - Return the student subject grade detail for a given student
+func GetStudentSubjectListRowByStudentID(studentID uint) []*SubjectListRow {
+	// 	SELECT sb.name, ssc.first_ca, ssc.second_ca, ssc.first_exam, ssc.total_first, ssc.grade_first, ssc.remark_first
+	// FROM students as s
+	// INNER JOIN student_subject_classes as ssc ON s.id = ssc.student_id
+	// INNER JOIN subject_classes as sc ON sc.id = ssc.subject_class_id
+	// INNER JOIN subjects as sb on sb.id = sc.subject_id
+	// WHERE s.id = 32;
+
+	// SELECT * FROM students WHERE id = 32;
+	var result []*SubjectListRow
+
+	rows, _ := GetDB().Raw(`SELECT sb.name, ssc.first_ca, ssc.second_ca, ssc.first_exam, ssc.total_first, ssc.grade_first, ssc.remark_first
+	FROM students as s
+	INNER JOIN student_subject_classes as ssc ON s.id = ssc.student_id
+	INNER JOIN subject_classes as sc ON sc.id = ssc.subject_class_id
+	INNER JOIN subjects as sb on sb.id = sc.subject_id
+	WHERE s.id = ?`, studentID).Rows()
+
+	defer rows.Close()
+	for rows.Next() {
+		var row SubjectListRow
+		db.ScanRows(rows, &row)
+
+		result = append(result, &row)
+
+	}
+
+	return result
 }
