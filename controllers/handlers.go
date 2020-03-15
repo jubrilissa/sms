@@ -70,6 +70,51 @@ func getUser(s *sessions.Session) models.User {
 // 	return user
 // }
 
+func StudentLoginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		tmpl := template.Must(template.ParseFiles("templates/student-login.html"))
+		tmpl.Execute(w, nil)
+	} else {
+		session, err := store.Get(r, "cookie-name")
+		r.ParseMultipartForm(32 << 20)
+		email := r.FormValue("surname")
+		id := r.FormValue("password")
+		intId, err := strconv.Atoi(id)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		fmt.Println("name is and id is ", email, id)
+
+		// TODO: Update the login here to return quickly for failed login
+		if models.StudentLogin(email, uint(intId)) {
+			currentStudent := models.GetSingleStudentById(uint(intId))
+			fmt.Println("Login SuccessFul")
+			session.Values["user"] = currentStudent.ID
+			session.Values["authenticated"] = true
+			session.Values["user"] = currentStudent.Name
+
+			fmt.Println("The user has name of ", currentStudent.Name)
+
+			err = session.Save(r, w)
+			if err != nil {
+				session.AddFlash("Error when trying to log in")
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			http.Redirect(w, r, "/student-dashboard", http.StatusFound)
+
+		} else {
+			fmt.Println("Login Failed")
+			session.AddFlash("Login Failed")
+
+		}
+
+	}
+
+}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		tmpl := template.Must(template.ParseFiles("templates/login.html"))
@@ -1048,7 +1093,7 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 
 	var StudentSubjectScoreDetails []StudentResultPageData
 
-	type StudentDetaisResultDats struct {
+	type StudentDetailsResultData struct {
 		Student                     *models.Student
 		SubjectScoreDetails         []StudentResultPageData
 		TotalObtainable             int
@@ -1060,12 +1105,24 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		OverallGradeFromPercentage  string
 	}
 
-	studentSubcjectClass := models.GetStudentSubjectsClassByStudentID(uint(id))
-	fmt.Println(studentSubcjectClass)
+	GetSubjectListRow := models.GetStudentSubjectListRowByStudentID(uint(id))
+	fmt.Println(GetSubjectListRow)
+
+	studentSubjectClass := models.GetStudentSubjectsClassByStudentID(uint(id))
+	fmt.Println(studentSubjectClass)
 	// teachers := models.GetAllUserByRole("teacher")
 
-	for _, singleStudentSubjectDetail := range studentSubcjectClass {
-		totalScore := singleStudentSubjectDetail.FirstCA + singleStudentSubjectDetail.SecondCA + singleStudentSubjectDetail.FirstExam
+	// FIXME: This was commented to update for second term
+	// for _, singleStudentSubjectDetail := range studentSubjectClass {
+	// 	totalScore := singleStudentSubjectDetail.FirstCA + singleStudentSubjectDetail.SecondCA + singleStudentSubjectDetail.FirstExam
+	// 	grade := GetGradeFromScore(float64(totalScore))
+	// 	remark := GetRemarkFromScore(float64(totalScore))
+	// 	updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark)
+	// 	fmt.Println(updatedStudentSubjectClass)
+	// }
+
+	for _, singleStudentSubjectDetail := range studentSubjectClass {
+		totalScore := singleStudentSubjectDetail.SFirstCA + singleStudentSubjectDetail.SSecondCA + singleStudentSubjectDetail.SecondExam
 		grade := GetGradeFromScore(float64(totalScore))
 		remark := GetRemarkFromScore(float64(totalScore))
 		updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark)
@@ -1073,15 +1130,16 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: So many expensive db calls here
-	studentSubcjectClass = models.GetStudentSubjectsClassByStudentID(uint(id))
+	studentSubjectClass = models.GetStudentSubjectsClassByStudentID(uint(id))
 	studentDetails := models.GetSingleStudentById(uint(id))
 
 	println("I got the student details also ", studentDetails)
 
 	var studentTotal float32
 
-	for _, singleStudentSubjectDetail := range studentSubcjectClass {
-		studentTotal += singleStudentSubjectDetail.TotalFirst
+	for _, singleStudentSubjectDetail := range studentSubjectClass {
+		// studentTotal += singleStudentSubjectDetail.TotalFirst
+		studentTotal += singleStudentSubjectDetail.TotalSecond
 		currentSubject := models.GetSubjectBySubjectClassId(singleStudentSubjectDetail.SubjectClassID)
 		fmt.Println("The name of the subject is", currentSubject.Name)
 		StudentSubjectScoreDetails = append(StudentSubjectScoreDetails, StudentResultPageData{
@@ -1090,9 +1148,9 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	numberOfSubjectOffered := len(studentSubcjectClass)
+	numberOfSubjectOffered := len(studentSubjectClass)
 	var studentPercentage float64
-	studentPercentage = float64(studentTotal) / float64(len(studentSubcjectClass))
+	studentPercentage = float64(studentTotal) / float64(len(studentSubjectClass))
 
 	studentPercentage = math.Round(studentPercentage*10) / 10
 	totalScoreObtainable := numberOfSubjectOffered * 100
@@ -1104,7 +1162,7 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("The total score obtainable is ", totalScoreObtainable)
 	fmt.Println("The number of subject offered is ", numberOfSubjectOffered)
 
-	pVariables := StudentDetaisResultDats{
+	pVariables := StudentDetailsResultData{
 		Student:                     studentDetails,
 		SubjectScoreDetails:         StudentSubjectScoreDetails,
 		TotalObtainable:             totalScoreObtainable,
@@ -1379,6 +1437,81 @@ func AddStudentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func StudentPaymentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+		student := models.GetSingleStudentById(uint(id))
+
+		files := []string{
+			filepath.Join(templatesDir, "student-payment.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		tmpl := template.Must(template.
+			ParseFiles(files...))
+
+		tmpl.Execute(w, student)
+
+	} else {
+		session, _ := store.Get(r, "cookie-name")
+		// if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		// 	http.Redirect(w, r, "/login", http.StatusFound)
+		// 	// http.Error(w, "Forbidden", http.StatusForbidden)
+		// 	return
+		// }
+
+		currentUser := getUser(session)
+
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+		// UpdateStudentSubject
+		student := models.GetSingleStudentById(uint(id))
+		amountPaidStr := r.FormValue("amount")
+		amountPaid, _ := strconv.ParseFloat(amountPaidStr, 64)
+		outstandingDebt := student.OutstandingDebt
+		IsFeeCompleted := false
+
+		if amountPaid-outstandingDebt < 0 {
+			student.OutstandingDebt = outstandingDebt - amountPaid
+		} else if amountPaid-outstandingDebt > 0 {
+			student.OutstandingDebt = 0
+			currenTermPayment := student.PresentTermPayment + amountPaid - outstandingDebt
+			student.PresentTermPayment = currenTermPayment
+			student.PresentTermBalance = student.PresentTermFees - currenTermPayment
+			// student.PresentTermBalance =
+			if currenTermPayment >= student.PresentTermFees {
+				IsFeeCompleted = true
+				student.IsFeeCompleted = IsFeeCompleted
+			}
+
+		} else {
+			// This definitely means payment made was just to clear the outstanding
+			student.OutstandingDebt = 0
+		}
+		// studentModel := &models.Student{}
+		// models.GetDB().Model(&studentModel).Updates(student)
+		models.GetDB().Save(&student)
+
+		feesPayment := &models.FeesPayment{}
+		feesPayment.StudentID = student.ID
+		feesPayment.Amount = amountPaid
+		feesPayment.UserID = currentUser.ID
+		feesPayment.IsComplete = IsFeeCompleted
+		feesPayment.Create()
+		http.Redirect(w, r, "/fees", http.StatusFound)
+	}
+
+}
+
+func StudentDashboardHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		requestParams := mux.Vars(r)
 		id, err := strconv.Atoi(requestParams["id"])
