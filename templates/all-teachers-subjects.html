@@ -46,6 +46,8 @@
                                                     <div class="col-lg-12">
                                                         <div class="content-profile">
                                                             <h1>Notes about {{.Teacher.Name}}</h1>
+
+
                                                             
                                                             
                                                         </div>
@@ -66,7 +68,12 @@
                                                             <ul>
                                                                     SubjectClassDetails
                                                                     {{ range  $index, $value := .SubjectClassDetails}}
-                                                                    <li><i class="fa fa-angle-right"></i> {{.Subject.Name}} {{.SubjectClass.Class}} <a href="/grade-subject/{{.SubjectClass.ID}}">Grade subject</a></li>
+                                                                    <li><i class="fa fa-angle-right"></i> {{.Subject.Name}} {{.SubjectClass.Class}} 
+                                                                        {{if $.AllowGrading }}
+                                                                        <a href="/grade-subject/{{.SubjectClass.ID}}">Grade subject</a>
+                                                                        
+                                                                        {{end}}
+                                                                    </li>
                                                                     
                                                                     {{end}}                                                                
                                                             </ul>

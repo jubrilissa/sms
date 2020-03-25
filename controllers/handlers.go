@@ -291,7 +291,21 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ViewAllTeacherHandler(w http.ResponseWriter, r *http.Request) {
-	teachers := models.GetAllUserByRole("teacher")
+	session, _ := store.Get(r, "cookie-name")
+	currentUser := getUser(session)
+
+	// currentRole := currentUser.Role
+	type TeacherPageVariable struct {
+		CurrentTeacher models.User
+		Teachers       []models.User
+	}
+
+	// FIXME: Currently some users are principal and teachers. So, returning all roles
+	// teachers := models.GetAllUserByRole("teacher")
+	teachers := models.GetAllUsers()
+
+	fmt.Println("The current user is ", currentUser)
+	// pVariables :=
 
 	files := []string{
 		filepath.Join(templatesDir, "all-teachers.html"),
@@ -477,6 +491,7 @@ func ViewYourSubjectHandler(w http.ResponseWriter, r *http.Request) {
 		type TeacherSubjectsPageVariable struct {
 			Teacher             models.User
 			SubjectClassDetails []TeacherSubjectVariable
+			AllowGrading        bool
 		}
 		teacherSubjectClass := models.GetSubjectClassForTeacher(currentUser.ID)
 
@@ -491,6 +506,7 @@ func ViewYourSubjectHandler(w http.ResponseWriter, r *http.Request) {
 		finalPVariables := TeacherSubjectsPageVariable{
 			Teacher:             currentUser,
 			SubjectClassDetails: SubjectsDetails,
+			AllowGrading:        true,
 		}
 
 		files := []string{
@@ -1434,6 +1450,62 @@ func AddStudentHandler(w http.ResponseWriter, r *http.Request) {
 		ParseFiles(files...))
 
 	tmpl.Execute(w, nil)
+}
+
+func TeacherSubjectHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+
+		requestParams := mux.Vars(r)
+		id, err := strconv.Atoi(requestParams["id"])
+
+		if err != nil {
+			panic(err.Error())
+		}
+		type TeacherSubjectVariable struct {
+			SubjectClass *models.SubjectClass
+			Subject      *models.Subject
+		}
+
+		var SubjectsDetails []TeacherSubjectVariable
+		type TeacherSubjectsPageVariable struct {
+			Teacher             models.User
+			SubjectClassDetails []TeacherSubjectVariable
+			AllowGrading        bool
+		}
+		teacherSubjectClass := models.GetSubjectClassForTeacher(uint(id))
+		currentUser := *models.GetUserByID(uint(id))
+
+		for _, singleSubjectClass := range teacherSubjectClass {
+
+			currentSubject := models.GetSubjectById(singleSubjectClass.SubjectID)
+			SubjectsDetails = append(SubjectsDetails, TeacherSubjectVariable{
+				SubjectClass: singleSubjectClass,
+				Subject:      currentSubject,
+			})
+		}
+		finalPVariables := TeacherSubjectsPageVariable{
+			Teacher:             currentUser,
+			SubjectClassDetails: SubjectsDetails,
+			AllowGrading:        false,
+		}
+
+		files := []string{
+			filepath.Join(templatesDir, "all-teachers-subjects.html"),
+			filepath.Join(templatesDir, "base.html"),
+		}
+
+		// tmpl := template.Must(template.
+		// 	ParseFiles(files...))
+
+		tmpl, err := template.ParseFiles(files...)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		tmpl.Execute(w, &finalPVariables)
+	}
+
 }
 
 func StudentPaymentHandler(w http.ResponseWriter, r *http.Request) {

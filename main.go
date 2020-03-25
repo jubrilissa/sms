@@ -23,8 +23,9 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/", controllers.DashboardHandler)
+	router.HandleFunc("/", controllers.PrincipalRoleRequired(controllers.DashboardHandler))
 	router.HandleFunc("/login", controllers.LoginHandler)
+	router.HandleFunc("/student-login", controllers.StudentLoginHandler)
 	router.HandleFunc("/register", controllers.RegisterHandler)
 	router.HandleFunc("/logout", controllers.LogoutHandler)
 
@@ -47,6 +48,8 @@ func main() {
 
 	// router.HandleFunc("/student/{id}", controllers.ViewSingleStudentHandler).Methods("GET", "POST")
 
+	// router.HandleFunc("/student-dashboard/{id:[0-9]+}", controllers.StudentPaymentHandler).Methods("GET", "POST")
+	router.HandleFunc("/teacher-subject/{id:[0-9]+}", controllers.TeacherSubjectHandler).Methods("GET", "POST")
 	router.HandleFunc("/student-payment/{id:[0-9]+}", controllers.StudentPaymentHandler).Methods("GET", "POST")
 	router.HandleFunc("/student-profile/{id:[0-9]+}", controllers.ViewSingleStudentHandler).Methods("GET", "POST")
 	router.HandleFunc("/student-result/{id:[0-9]+}", controllers.ViewSingleStudentResultHandler).Methods("GET", "POST")

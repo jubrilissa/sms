@@ -62,6 +62,20 @@ func GetAllUserByRole(role string) []*User {
 
 }
 
+func GetAllUsers() []*User {
+	users := make([]*User, 0)
+
+	err := GetDB().Table("users").Find(&users).Error
+
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return users
+
+}
+
 // GetUserByID - Get the user object for a give id
 func GetUserByID(id uint) *User {
 	user := &User{}
