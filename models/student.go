@@ -153,3 +153,27 @@ func GetNoOfStudentInSchool() int64 {
 	GetDB().Model(&Student{}).Count(&count)
 	return count
 }
+
+func StudentLogin(surname string, id uint) bool {
+
+	student := &Student{}
+	err := GetDB().Table("students").Where("name = ? AND id = ?", id).First(student).Error
+
+	// user := &User{}
+	// err := GetDB().Table("users").Where("email = ?", surname).First(user).Error
+
+	if err != nil && err == gorm.ErrRecordNotFound {
+		return false
+	}
+
+	fmt.Println("student name", student.Name)
+
+	// err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	// if err != nil && err == bcrypt.ErrMismatchedHashAndPassword { //Password does not match!
+	// 	fmt.Println("The password hash compairison failed")
+	// 	return false
+	// }
+
+	return true
+
+}
