@@ -50,14 +50,27 @@ result_set_to_destroy = engine.execute("SELECT * FROM student_subject_classes OR
 
 student_dict = {}
 
+# import pdb; pdb.set_trace()
 for i in result_set_to_destroy:
     if student_dict.get(i[4]):
-        if student_dict.get(i[4]).get(i[5]):
+        student_class = engine.execute(f"SELECT class_text FROM students WHERE id={i[4]}").fetchone()
+        subject_class = engine.execute(f"SELECT class FROM subject_classes WHERE id={i[5]}").fetchone()
+        if student_class[0] != subject_class[0]:
             print(f'The following were duplicated student_id = {i[4]} subject_dict= {i[5]} id = {i[0]} ')
             engine.execute(f"DELETE FROM student_subject_classes WHERE id={i[0]}")
         student_dict[i[4]].update({
             i[5]: i[0]
         })
+        
+
+        # if student current class is not the same as subject class delete student subject class record
+        # if 
+        # if student_dict.get(i[4]).get(i[5]):
+        #     print(f'The following were duplicated student_id = {i[4]} subject_dict= {i[5]} id = {i[0]} ')
+        #     engine.execute(f"DELETE FROM student_subject_classes WHERE id={i[0]}")
+        # student_dict[i[4]].update({
+        #     i[5]: i[0]
+        # })
     else:
         student_dict[i[4]] = {
             i[5]: i[0]
