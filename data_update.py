@@ -24,24 +24,43 @@ engine = create_engine('postgresql://masterp:@localhost:5432/dev_sms_backup')
 #         student_subject_insert = engine.execute(insert_student_query, student_id=r[0], subject_class_id=i[0])
 
 
-result_set_ss1 =  engine.execute("SELECT * FROM students WHERE class_text = 'SSS1'")
+# result_set_ss1 =  engine.execute("SELECT * FROM students WHERE class_text = 'SSS1'")
 
-ss1_subject_results = engine.execute("SELECT id FROM student_subject_classes WHERE student_id = 21;")
+# ss1_subject_results = engine.execute("SELECT id FROM student_subject_classes WHERE student_id = 21;")
 
 # subject_class_ids = []
 # for i in ss1_subject_results:
 #     subject_class_ids.append(i[0])
 # import pdb; pdb.set_trace()
 
-for r in result_set_ss1:
-    print(r[0])
+# for r in result_set_ss1:
+#     print(r[0])
 
     
-    ss1_subject_results = engine.execute("SELECT id FROM student_subject_classes WHERE student_id = 21;")
-    for i in ss1_subject_results:
-        # print(i, r)
-        insert_student_query = text("INSERT into student_subject_classes (student_id, subject_class_id, is_active, created_at, updated_at) VALUES(:student_id, :subject_class_id, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);")
-        print(f"The student id is {r[0]} and subject class id is {i[0]}")
-        student_subject_insert = engine.execute(insert_student_query, student_id=r[0], subject_class_id=i[0])
+#     ss1_subject_results = engine.execute("SELECT id FROM student_subject_classes WHERE student_id = 21;")
+#     for i in ss1_subject_results:
+#         # print(i, r)
+#         insert_student_query = text("INSERT into student_subject_classes (student_id, subject_class_id, is_active, created_at, updated_at) VALUES(:student_id, :subject_class_id, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);")
+#         print(f"The student id is {r[0]} and subject class id is {i[0]}")
+#         student_subject_insert = engine.execute(insert_student_query, student_id=r[0], subject_class_id=i[0])
 
 
+
+result_set_to_destroy = engine.execute("SELECT * FROM student_subject_classes ORDER BY student_id")
+
+student_dict = {}
+
+for i in result_set_to_destroy:
+    if student_dict.get(i[4]):
+        if student_dict.get(i[4]).get(i[5]):
+            print(f'The following were duplicated student_id = {i[4]} subject_dict= {i[5]} id = {i[0]} ')
+            engine.execute(f"DELETE FROM student_subject_classes WHERE id={i[0]}")
+        student_dict[i[4]].update({
+            i[5]: i[0]
+        })
+    else:
+        student_dict[i[4]] = {
+            i[5]: i[0]
+        }
+
+print(student_dict)
