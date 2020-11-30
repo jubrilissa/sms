@@ -1129,21 +1129,21 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	// teachers := models.GetAllUserByRole("teacher")
 
 	// FIXME: This was commented to update for second term
-	// for _, singleStudentSubjectDetail := range studentSubjectClass {
-	// 	totalScore := singleStudentSubjectDetail.FirstCA + singleStudentSubjectDetail.SecondCA + singleStudentSubjectDetail.FirstExam
-	// 	grade := GetGradeFromScore(float64(totalScore))
-	// 	remark := GetRemarkFromScore(float64(totalScore))
-	// 	updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark)
-	// 	fmt.Println(updatedStudentSubjectClass)
-	// }
-
 	for _, singleStudentSubjectDetail := range studentSubjectClass {
-		totalScore := singleStudentSubjectDetail.SFirstCA + singleStudentSubjectDetail.SSecondCA + singleStudentSubjectDetail.SecondExam
+		totalScore := singleStudentSubjectDetail.FirstCA + singleStudentSubjectDetail.SecondCA + singleStudentSubjectDetail.FirstExam
 		grade := GetGradeFromScore(float64(totalScore))
 		remark := GetRemarkFromScore(float64(totalScore))
 		updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark)
 		fmt.Println(updatedStudentSubjectClass)
 	}
+
+	// for _, singleStudentSubjectDetail := range studentSubjectClass {
+	// 	totalScore := singleStudentSubjectDetail.SFirstCA + singleStudentSubjectDetail.SSecondCA + singleStudentSubjectDetail.SecondExam
+	// 	grade := GetGradeFromScore(float64(totalScore))
+	// 	remark := GetRemarkFromScore(float64(totalScore))
+	// 	updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark)
+	// 	fmt.Println(updatedStudentSubjectClass)
+	// }
 
 	// TODO: So many expensive db calls here
 	studentSubjectClass = models.GetStudentSubjectsClassByStudentID(uint(id))
