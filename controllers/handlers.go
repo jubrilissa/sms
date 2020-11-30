@@ -1083,7 +1083,7 @@ func GetPrincipalRemarkFromPercentage(percentage float64) string {
 	if percentage >= 70 {
 		return "An excellent performance. keep it up."
 	} else if percentage >= 60 && percentage < 70 {
-		return "A good perfromance, however, there is still room for improvement next term."
+		return "A good performance, however, there is still room for improvement next term."
 	} else if percentage >= 50 && percentage < 60 {
 		return "An average performance. Concentrate more on your weak subjects."
 	} else if percentage >= 40 && percentage < 50 {
