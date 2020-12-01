@@ -66,11 +66,11 @@ func UpdateStudentscore(id uint, fieldName string, score float32) *StudentSubjec
 
 	switch fieldName {
 	case "firstCA":
-		GetDB().Model(&studentSubjectClass).Update("s_first_ca", score)
+		GetDB().Model(&studentSubjectClass).Update("first_ca", score)
 	case "secondCA":
-		GetDB().Model(&studentSubjectClass).Update("s_second_ca", score)
+		GetDB().Model(&studentSubjectClass).Update("second_ca", score)
 	case "firstExam":
-		GetDB().Model(&studentSubjectClass).Update("second_exam", score)
+		GetDB().Model(&studentSubjectClass).Update("first_exam", score)
 	}
 
 	return studentSubjectClass
