@@ -149,3 +149,38 @@ func GetStudentSubjectListRowByStudentID(studentID uint) []*SubjectListRow {
 
 	return result
 }
+
+func GetStudentSubjectClassById(id uint) *StudentSubjectClass {
+	studentSubjectClass := &StudentSubjectClass{}
+	err := GetDB().Table("student_subject_classes").Where("id = ?", id).First(studentSubjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return studentSubjectClass
+}
+
+// func DeleteStudentSubject(id uint) *StudentSubjectClass {
+// 	studentSubjectClass := &StudentSubjectClass{}
+// 	GetDB().Delete(&StudentSubjectClass{}, id)
+// 	err := GetDB().Table("student_subject_classes").Where("id = ?", id).First(studentSubjectClass).Error
+// 	if err != nil || err == gorm.ErrRecordNotFound {
+// 		return nil
+// 	}
+
+// 	GetDB().Model(&studentSubjectClass).Update(
+// 		StudentSubjectClass{
+// 			gorm.Model.D: time.Now(),
+// 		})
+// 		// db.Delete(&User{}, "10")
+// 	return studentSubjectClass
+
+// }
+
+// func GetSubjectClassById(id uint) *SubjectClass {
+// 	subjectClass := &SubjectClass{}
+// 	err := GetDB().Table("subject_classes").Where("id = ?", id).First(subjectClass).Error
+// 	if err != nil || err == gorm.ErrRecordNotFound {
+// 		return nil
+// 	}
+// 	return subjectClass
+// }
