@@ -86,7 +86,7 @@
                                                         <div class="ex-pro">
                                                             <ul>
                                                                     {{ range  $index, $value := .Subject}}
-                                                                    <li><i class="fa fa-angle-right"></i> {{.Name}} {{.ID}}. {{if eq $studentClass "SSS1"}}<a href="/delete-subject/{{.ID}}/{{$studentId}}">Delete subject</a>{{end}}</li>
+                                                                    <li><i class="fa fa-angle-right"></i> {{.Name}}. {{if eq $studentClass "SSS1"}}<a href="/delete-subject/{{.ID}}/{{$studentId}}">Delete subject</a>{{end}}</li>
                                                                     {{end}}
                                                                 <!-- <li><i class="fa fa-angle-right"></i> Yoruba.</li>
                                                                 <li><i class="fa fa-angle-right"></i> Chemistry.</li>
