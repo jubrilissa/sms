@@ -103,6 +103,15 @@ func GetSubjectClassById(id uint) *SubjectClass {
 	return subjectClass
 }
 
+func GetSubjectClassBySubjectIdAndClass(subject_id uint, classText string) *SubjectClass {
+	subjectClass := &SubjectClass{}
+	err := GetDB().Table("subject_classes").Where("subject_id = ? AND class = ?", subject_id, classText).First(subjectClass).Error
+	if err != nil || err == gorm.ErrRecordNotFound {
+		return nil
+	}
+	return subjectClass
+}
+
 // func GetSubjectClassDetails() []*SubjectClass {
 // 	subjectClass := make([]*SubjectClass, 0)
 
