@@ -14,6 +14,8 @@
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 col-xs-6">
                                         <div class="address-hr">
+                                        {{$studentClass := .Student.ClassText}}
+                                        {{$studentId := .Student.ID}}
                                             <p><b>Name</b><br /> {{.Student.Name}}</p>
                                         </div>
                                     </div>
@@ -84,7 +86,7 @@
                                                         <div class="ex-pro">
                                                             <ul>
                                                                     {{ range  $index, $value := .Subject}}
-                                                                    <li><i class="fa fa-angle-right"></i> {{.Name}}.</li>
+                                                                    <li><i class="fa fa-angle-right"></i> {{.Name}} {{.ID}}. {{if eq $studentClass "SSS1"}}<a href="/delete-subject/{{.ID}}/{{$studentId}}">Delete subject</a>{{end}}</li>
                                                                     {{end}}
                                                                 <!-- <li><i class="fa fa-angle-right"></i> Yoruba.</li>
                                                                 <li><i class="fa fa-angle-right"></i> Chemistry.</li>
