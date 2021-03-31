@@ -1094,6 +1094,31 @@ func GetPrincipalRemarkFromPercentage(percentage float64) string {
 
 }
 
+func DeleteSingleStudentSubjectHandler(w http.ResponseWriter, r *http.Request) {
+	requestParams := mux.Vars(r)
+	subject_id, err := strconv.Atoi(requestParams["subject_id"])
+	student_id, err := strconv.Atoi(requestParams["student_id"])
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// TODO: What happens if the class is updated
+	student := models.GetSingleStudentById(uint(student_id))
+	subjectClass := models.GetSubjectClassBySubjectIdAndClass(uint(subject_id), student.ClassText)
+	// studentSubjectClass := models.GetStudentSubjectClassById(uint(id))
+	// studentID := studentSubjectClass.StudentID
+
+	models.GetDB().Where("subject_class_id =? AND student_id=? ", subjectClass.ID, student.ID).Delete(&models.StudentSubjectClass{})
+	// err := GetDB().Table("student_subject_classes").Where("id = ?", id).First(studentSubjectClass).Error
+	// if err != nil || err == gorm.ErrRecordNotFound {
+	// 	return nil
+	// }
+	redirectURL := fmt.Sprintf("/student-profile/%d", student_id)
+	fmt.Println(redirectURL)
+	http.Redirect(w, r, redirectURL, http.StatusFound)
+
+}
+
 func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	requestParams := mux.Vars(r)
 	id, err := strconv.Atoi(requestParams["id"])
