@@ -53,7 +53,7 @@ func main() {
 	router.HandleFunc("/student-payment/{id:[0-9]+}", controllers.StudentPaymentHandler).Methods("GET", "POST")
 	router.HandleFunc("/student-profile/{id:[0-9]+}", controllers.ViewSingleStudentHandler).Methods("GET", "POST")
 	router.HandleFunc("/student-result/{id:[0-9]+}", controllers.ViewSingleStudentResultHandler).Methods("GET", "POST")
-	router.HandleFunc("/assign-subject/{id:[0-9]+}", controllers.AssignSubjectHandler).Methods("GET", "POST")
+	router.HandleFunc("/assign-subject/{id:[0-9]+}", controllers.PrincipalRoleRequired(controllers.AssignSubjectHandler)).Methods("GET", "POST")
 	router.HandleFunc("/update-subject/{id:[0-9]+}", controllers.UpdateSubjectHandler).Methods("GET", "POST")
 	router.HandleFunc("/outstanding-debt/{id:[0-9]+}", controllers.PrincipalRoleRequired(controllers.UpdateOutstandingDebt)).Methods("GET", "POST")
 	router.HandleFunc("/print-receipt/{id:[0-9]+}", controllers.PrincipalRoleRequired(controllers.PrintReceiptForStudnet)).Methods("GET", "POST")
