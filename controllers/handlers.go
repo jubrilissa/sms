@@ -1179,8 +1179,8 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	var studentTotal float32
 
 	for _, singleStudentSubjectDetail := range studentSubjectClass {
-		// studentTotal += singleStudentSubjectDetail.TotalFirst
-		studentTotal += singleStudentSubjectDetail.TotalSecond
+		studentTotal += singleStudentSubjectDetail.TotalFirst
+		// studentTotal += singleStudentSubjectDetail.TotalSecond
 		currentSubject := models.GetSubjectBySubjectClassId(singleStudentSubjectDetail.SubjectClassID)
 		fmt.Println("The name of the subject is", currentSubject.Name)
 		StudentSubjectScoreDetails = append(StudentSubjectScoreDetails, StudentResultPageData{
