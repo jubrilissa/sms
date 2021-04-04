@@ -101,9 +101,9 @@ func UpdateStudentSubject(id uint, total float32, grade string, remark string) *
 	// 	})
 	GetDB().Model(&studentSubjectClass).Update(
 		StudentSubjectClass{
-			TotalSecond:  total,
-			GradeSecond:  grade,
-			RemarkSecond: remark,
+			TotalFirst:  total,
+			GradeFirst:  grade,
+			RemarkFirst: remark,
 		})
 	return studentSubjectClass
 

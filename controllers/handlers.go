@@ -1154,6 +1154,15 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	// teachers := models.GetAllUserByRole("teacher")
 
 	// FIXME: This was commented to update for second term
+	// ************************************************************************************
+	// TODO:  VERY IMPORTANT
+	/*
+			TODO: Ensure that the second term first term result  is gotten from the backup bcos
+		// Initially models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark) was overwrting first term results during second term.
+		// The backup is the source of truth for first term
+		****************************************************
+	*/
+
 	for _, singleStudentSubjectDetail := range studentSubjectClass {
 		totalScore := singleStudentSubjectDetail.FirstCA + singleStudentSubjectDetail.SecondCA + singleStudentSubjectDetail.FirstExam
 		grade := GetGradeFromScore(float64(totalScore))
