@@ -1064,32 +1064,45 @@ func GetGradeFromScore(score float64) string {
 	}
 }
 
+func GetSessionAverage(studentSubjectClass models.StudentSubjectClass) float32 {
+	if studentSubjectClass.TotalThird <= 0 {
+		return studentSubjectClass.TotalThird
+	}
+	if studentSubjectClass.TotalSecond > 0 && studentSubjectClass.TotalFirst > 0 {
+		return (studentSubjectClass.TotalFirst + studentSubjectClass.TotalSecond + studentSubjectClass.TotalThird) / 3
+	}
+	if studentSubjectClass.TotalSecond > 0 {
+		return (studentSubjectClass.TotalSecond + studentSubjectClass.TotalThird) / 2
+	}
+	return studentSubjectClass.TotalThird
+}
+
 func GetTeacherRemarkFromPercentage(percentage float64) string {
 	if percentage >= 70 {
-		return "A splendid result. Increase your academic tempo. The sky is the beginning."
+		return "A splendid performance. Keep it up."
 	} else if percentage >= 60 && percentage < 70 {
-		return "A good result. Do not relent in your efforts."
+		return "Keep working, you have the chance to be among the best."
 	} else if percentage >= 50 && percentage < 60 {
-		return "An average result. Work hard and don't be left behind."
+		return "Put in more effort next term to be among the best."
 	} else if percentage >= 40 && percentage < 50 {
-		return "Below average is not good for you. Work harder next term."
+		return "You have to sit-up and work hard next term."
 	} else {
-		return "Poor result. Work hard or you will be left behind."
+		return "A very poor result. You need extra lesson!"
 	}
 
 }
 
 func GetPrincipalRemarkFromPercentage(percentage float64) string {
 	if percentage >= 70 {
-		return "An excellent performance. keep it up."
+		return "An excellent result. Promoted to next class."
 	} else if percentage >= 60 && percentage < 70 {
-		return "A good performance, however, there is still room for improvement next term."
+		return "A good result. Promoted to next class."
 	} else if percentage >= 50 && percentage < 60 {
-		return "An average performance. Concentrate more on your weak subjects."
+		return "An average performance. Promoted to next class."
 	} else if percentage >= 40 && percentage < 50 {
-		return "A below average performance. Put in more effort in your academics."
+		return "A poor performance. Promoted on trial."
 	} else {
-		return "A very poor performance. You need to put in extra effort next term."
+		return "A very poor performance. You are advised to repeat this class!"
 	}
 
 }
@@ -1164,10 +1177,11 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	*/
 
 	for _, singleStudentSubjectDetail := range studentSubjectClass {
-		totalScore := singleStudentSubjectDetail.FirstCA + singleStudentSubjectDetail.SecondCA + singleStudentSubjectDetail.FirstExam
-		grade := GetGradeFromScore(float64(totalScore))
-		remark := GetRemarkFromScore(float64(totalScore))
-		updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark)
+		totalScore := singleStudentSubjectDetail.TFirstCA + singleStudentSubjectDetail.TSecondCA + singleStudentSubjectDetail.ThirdExam
+		average := math.Round(float64(GetSessionAverage(*singleStudentSubjectDetail))*100) / 100
+		grade := GetGradeFromScore(float64(average))
+		remark := GetRemarkFromScore(float64(average))
+		updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark, average)
 		fmt.Println(updatedStudentSubjectClass)
 	}
 
@@ -1188,7 +1202,7 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	var studentTotal float32
 
 	for _, singleStudentSubjectDetail := range studentSubjectClass {
-		studentTotal += singleStudentSubjectDetail.TotalFirst
+		studentTotal += float32(singleStudentSubjectDetail.Average)
 		// studentTotal += singleStudentSubjectDetail.TotalSecond
 		currentSubject := models.GetSubjectBySubjectClassId(singleStudentSubjectDetail.SubjectClassID)
 		fmt.Println("The name of the subject is", currentSubject.Name)

@@ -24,6 +24,13 @@ type StudentSubjectClass struct {
 	TotalSecond  float32
 	GradeSecond  string
 	RemarkSecond string
+	TFirstCA     float32
+	TSecondCA    float32
+	ThirdExam    float32
+	TotalThird   float32
+	GradeThird   string
+	RemarkThird  string
+	Average      float64
 }
 
 func (studentSubjectClass *StudentSubjectClass) Create() {
@@ -66,11 +73,11 @@ func UpdateStudentscore(id uint, fieldName string, score float32) *StudentSubjec
 
 	switch fieldName {
 	case "firstCA":
-		GetDB().Model(&studentSubjectClass).Update("first_ca", score)
+		GetDB().Model(&studentSubjectClass).Update("t_first_ca", score)
 	case "secondCA":
-		GetDB().Model(&studentSubjectClass).Update("second_ca", score)
+		GetDB().Model(&studentSubjectClass).Update("t_second_ca", score)
 	case "firstExam":
-		GetDB().Model(&studentSubjectClass).Update("first_exam", score)
+		GetDB().Model(&studentSubjectClass).Update("third_exam", score)
 	}
 
 	return studentSubjectClass
@@ -86,7 +93,7 @@ func GetStudentSubjectsClassByStudentID(studentID uint) []*StudentSubjectClass {
 	return studentSubjectClass
 }
 
-func UpdateStudentSubject(id uint, total float32, grade string, remark string) *StudentSubjectClass {
+func UpdateStudentSubject(id uint, total float32, grade string, remark string, average float64) *StudentSubjectClass {
 	studentSubjectClass := &StudentSubjectClass{}
 	err := GetDB().Table("student_subject_classes").Where("id = ?", id).First(studentSubjectClass).Error
 	if err != nil || err == gorm.ErrRecordNotFound {
@@ -101,9 +108,10 @@ func UpdateStudentSubject(id uint, total float32, grade string, remark string) *
 	// 	})
 	GetDB().Model(&studentSubjectClass).Update(
 		StudentSubjectClass{
-			TotalFirst:  total,
-			GradeFirst:  grade,
-			RemarkFirst: remark,
+			TotalThird:  total,
+			GradeThird:  grade,
+			RemarkThird: remark,
+			Average:     average,
 		})
 	return studentSubjectClass
 

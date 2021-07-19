@@ -27,12 +27,13 @@
               <div class="">
 
                 <div>
-                  <img src="/static/img/student-modified/logo.jpg" alt="" />
+                  <img src="/static/img/student-modified/logo2.png" alt="" />
+                  {{/* <img src="/static/img/student-modified/logo.jpg" alt="" /> */}}
                 </div>
 
 
 
-                <h3 id="current-term-header">SECOND TERM STUDENT'S PERFORMANCE REPORT</h3>
+                <h3 id="current-term-header">THIRD TERM STUDENT'S PERFORMANCE REPORT</h3>
 
                 <div class="d-flex justify-content-between bd-highlight mb-3">
 
@@ -97,7 +98,7 @@
 
               <table class="table table-bordered">
                 <thead class="thead-light">
-                  <tr>
+                  {{/* <tr>
                     <th scope="col">SUBJECTS</th>
                     <th scope="col">FIRST CA</th>
                     <th scope="col">SECOND CA</th>
@@ -105,7 +106,19 @@
                     <th scope="col">TOTAL</th>
                     <th scope="col">GRADE</th>
                     <th scope="col">REMARKS</th>
-                  </tr>
+                  </tr> */}}
+                  <tr>
+                        <th scope="col">SUBJECTS</th>
+                        <th scope="col">FIRST CA</th>
+                        <th scope="col">SECOND CA</th>
+                        <th scope="col">EXAM</th>
+                        <th scope="col">TOTAL</th>
+                        <th scope="col">FIRST TERM</th>
+                        <th scope="col">SECOND TERM</th>
+                        <th scope="col">AVERAGE</th>
+                        <th scope="col">GRADE</th>
+                        <th scope="col">REMARKS</th>
+                      </tr>
                 </thead>
                 <tbody>
                   {{ range  $index, $value := .SubjectScoreDetails}}
@@ -113,12 +126,15 @@
                     <!-- <th scope="row">1</th> -->
                     <td>{{.Subject.Name}}</td>
                     <!-- <td><a href="#" id="username" data-type="text" data-pk="1" data-title="Enter username">superuser</a></td> -->
-                    <td>{{.StudentSubjectClass.FirstCA}}</td>
-                    <td>{{.StudentSubjectClass.SecondCA}}</td>
-                    <td>{{.StudentSubjectClass.FirstExam}}</td>
+                    <td>{{.StudentSubjectClass.TFirstCA}}</td>
+                    <td>{{.StudentSubjectClass.TSecondCA}}</td>
+                    <td>{{.StudentSubjectClass.ThirdExam}}</td>
+                    <td>{{.StudentSubjectClass.TotalThird}}</td>
                     <td>{{.StudentSubjectClass.TotalFirst}}</td>
-                    <td>{{.StudentSubjectClass.GradeFirst}}</td>
-                    <td>{{.StudentSubjectClass.RemarkFirst}}</td>
+                    <td>{{.StudentSubjectClass.TotalSecond}}</td>
+                    <td>{{.StudentSubjectClass.Average}}</td>
+                    <td>{{.StudentSubjectClass.GradeThird}}</td>
+                    <td>{{.StudentSubjectClass.RemarkThird}}</td>
                   </tr>
                   {{end}}
 
