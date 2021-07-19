@@ -445,7 +445,7 @@ func ViewAllStudentHandler(w http.ResponseWriter, r *http.Request) {
 		defer file.Close()
 
 		fmt.Fprintf(w, "%v", handler.Header)
-		f, err := os.OpenFile("./templates/img/student/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		f, err := os.OpenFile("./static/img/student-modified/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -1171,7 +1171,7 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO:  VERY IMPORTANT
 	/*
 			TODO: Ensure that the second term first term result  is gotten from the backup bcos
-		// Initially models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark) was overwrting first term results during second term.
+		// Initially models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark) was overwriting first term results during second term.
 		// The backup is the source of truth for first term
 		****************************************************
 	*/
