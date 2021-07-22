@@ -107,14 +107,20 @@
                     <th scope="col">GRADE</th>
                     <th scope="col">REMARKS</th>
                   </tr> */}}
+                  {{$DidFirstTerm := .DidFirstTerm}}
+                  {{ $DidSecondTerm := .DidSecondTerm}}
                   <tr>
                         <th scope="col">SUBJECTS</th>
                         <th scope="col">FIRST CA</th>
                         <th scope="col">SECOND CA</th>
                         <th scope="col">EXAM</th>
                         <th scope="col">TOTAL</th>
+                        {{ if $DidFirstTerm}}
                         <th scope="col">FIRST TERM</th>
+                        {{ end }}
+                        {{ if $DidSecondTerm}}
                         <th scope="col">SECOND TERM</th>
+                        {{ end }}
                         <th scope="col">AVERAGE</th>
                         <th scope="col">GRADE</th>
                         <th scope="col">REMARKS</th>
@@ -130,8 +136,12 @@
                     <td>{{.StudentSubjectClass.TSecondCA}}</td>
                     <td>{{.StudentSubjectClass.ThirdExam}}</td>
                     <td>{{.StudentSubjectClass.TotalThird}}</td>
+                    {{ if $DidFirstTerm}}
                     <td>{{.StudentSubjectClass.TotalFirst}}</td>
+                    {{ end }}
+                    {{ if $DidSecondTerm}}
                     <td>{{.StudentSubjectClass.TotalSecond}}</td>
+                    {{ end }}
                     <td>{{.StudentSubjectClass.Average}}</td>
                     <td>{{.StudentSubjectClass.GradeThird}}</td>
                     <td>{{.StudentSubjectClass.RemarkThird}}</td>
