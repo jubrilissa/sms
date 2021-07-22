@@ -1107,6 +1107,41 @@ func GetPrincipalRemarkFromPercentage(percentage float64) string {
 
 }
 
+func DidFirstTerm(studentSubjectClass []*models.StudentSubjectClass) bool {
+	// TODO: Perhaps should have a column that records the term a student did instaed of relying on zero as a ascore.
+	// This logic just check that 0.5 of the score is greater than zero before the column is rendred
+	numberOfSubjectOffered := len(studentSubjectClass)
+	subjectsRecorded := 0
+	for _, singleStudentSubjectDetail := range studentSubjectClass {
+		if singleStudentSubjectDetail.TotalFirst > 0 {
+			subjectsRecorded = subjectsRecorded + 1
+		}
+	}
+	percentageDone := float64(subjectsRecorded / numberOfSubjectOffered)
+	if percentageDone > 0.5 {
+		return true
+	}
+
+	return false
+}
+
+func DidSecondTerm(studentSubjectClass []*models.StudentSubjectClass) bool {
+	// TODO: Perhaps should have a column that records the term a student did instaed of relying on zero as a ascore.
+	// This logic just check that 0.5 of the score is greater than zero before the column is rendred
+	numberOfSubjectOffered := len(studentSubjectClass)
+	subjectsRecorded := 0
+	for _, singleStudentSubjectDetail := range studentSubjectClass {
+		if singleStudentSubjectDetail.TotalSecond > 0 {
+			subjectsRecorded = subjectsRecorded + 1
+		}
+	}
+	percentageDone := float64(subjectsRecorded / numberOfSubjectOffered)
+	if percentageDone > 0.5 {
+		return true
+	}
+	return false
+}
+
 func DeleteSingleStudentSubjectHandler(w http.ResponseWriter, r *http.Request) {
 	requestParams := mux.Vars(r)
 	subject_id, err := strconv.Atoi(requestParams["subject_id"])
@@ -1157,6 +1192,8 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		PrincipalRemarks            string
 		OverallRemarkFromPercentage string
 		OverallGradeFromPercentage  string
+		DidFirstTerm                bool
+		DidSecondTerm               bool
 	}
 
 	GetSubjectListRow := models.GetStudentSubjectListRowByStudentID(uint(id))
@@ -1183,7 +1220,16 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		remark := GetRemarkFromScore(float64(average))
 		updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark, average)
 		fmt.Println(updatedStudentSubjectClass)
+
+		// TODO: Test logic with null values in the database
+		if singleStudentSubjectDetail.TotalFirst > 0 {
+			fmt.Println("fhfh")
+		}
+
 	}
+
+	didFirstTerm := DidFirstTerm(studentSubjectClass)
+	didSecondTerm := DidSecondTerm(studentSubjectClass)
 
 	// for _, singleStudentSubjectDetail := range studentSubjectClass {
 	// 	totalScore := singleStudentSubjectDetail.SFirstCA + singleStudentSubjectDetail.SSecondCA + singleStudentSubjectDetail.SecondExam
@@ -1236,6 +1282,8 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		TeacherRemarks:              teacherRemarks,
 		OverallRemarkFromPercentage: GetRemarkFromScore(studentPercentage),
 		OverallGradeFromPercentage:  GetGradeFromScore(studentPercentage),
+		DidFirstTerm:                didFirstTerm,
+		DidSecondTerm:               didSecondTerm,
 	}
 
 	// files := []string{
