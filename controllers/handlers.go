@@ -1117,8 +1117,11 @@ func DidFirstTerm(studentSubjectClass []*models.StudentSubjectClass) bool {
 			subjectsRecorded = subjectsRecorded + 1
 		}
 	}
-	percentageDone := float64(subjectsRecorded / numberOfSubjectOffered)
+
+	percentageDone := float64(subjectsRecorded) / float64(numberOfSubjectOffered)
+
 	if percentageDone > 0.5 {
+
 		return true
 	}
 
@@ -1135,8 +1138,11 @@ func DidSecondTerm(studentSubjectClass []*models.StudentSubjectClass) bool {
 			subjectsRecorded = subjectsRecorded + 1
 		}
 	}
-	percentageDone := float64(subjectsRecorded / numberOfSubjectOffered)
+
+	percentageDone := float64(subjectsRecorded) / float64(numberOfSubjectOffered)
+
 	if percentageDone > 0.5 {
+
 		return true
 	}
 	return false
