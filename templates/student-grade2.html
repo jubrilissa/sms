@@ -137,7 +137,11 @@
                     <td>{{.StudentSubjectClass.ThirdExam}}</td>
                     <td>{{.StudentSubjectClass.TotalThird}}</td>
                     {{ if $DidFirstTerm}}
+                    {{ if eq .Subject.Name  "YORUBA"}}
+                    <td>-</td>
+                    {{ else }} 
                     <td>{{.StudentSubjectClass.TotalFirst}}</td>
+                    {{ end }}
                     {{ end }}
                     {{ if $DidSecondTerm}}
                     <td>{{.StudentSubjectClass.TotalSecond}}</td>
