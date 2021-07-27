@@ -96,7 +96,7 @@
             </div>
             <div class="">
 
-              <table class="table table-bordered">
+              <table class="table table-bordered" {{if ge .TotalNumberOfSubject 13}} style="font-size: smaller;" {{end}}>
                 <thead class="thead-light">
                   {{/* <tr>
                     <th scope="col">SUBJECTS</th>
@@ -137,6 +137,7 @@
                     <td>{{.StudentSubjectClass.ThirdExam}}</td>
                     <td>{{.StudentSubjectClass.TotalThird}}</td>
                     {{ if $DidFirstTerm}}
+                    {{/* They didn't do yoruba in first term */}}
                     {{ if eq .Subject.Name  "YORUBA"}}
                     <td>-</td>
                     {{ else }} 
