@@ -1120,12 +1120,8 @@ func DidFirstTerm(studentSubjectClass []*models.StudentSubjectClass) bool {
 
 	percentageDone := float64(subjectsRecorded) / float64(numberOfSubjectOffered)
 
-	if percentageDone > 0.5 {
+	return percentageDone > 0.5
 
-		return true
-	}
-
-	return false
 }
 
 func DidSecondTerm(studentSubjectClass []*models.StudentSubjectClass) bool {
@@ -1141,11 +1137,7 @@ func DidSecondTerm(studentSubjectClass []*models.StudentSubjectClass) bool {
 
 	percentageDone := float64(subjectsRecorded) / float64(numberOfSubjectOffered)
 
-	if percentageDone > 0.5 {
-
-		return true
-	}
-	return false
+	return percentageDone > 0.5
 }
 
 func DeleteSingleStudentSubjectHandler(w http.ResponseWriter, r *http.Request) {
@@ -1193,7 +1185,7 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		SubjectScoreDetails         []StudentResultPageData
 		TotalObtainable             int
 		StudentPercentage           float64
-		StudentTotalScore           float32
+		StudentTotalScore           float64
 		TeacherRemarks              string
 		PrincipalRemarks            string
 		OverallRemarkFromPercentage string
@@ -1246,10 +1238,10 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 
 	println("I got the student details also ", studentDetails)
 
-	var studentTotal float32
+	var studentTotal float64
 
 	for _, singleStudentSubjectDetail := range studentSubjectClass {
-		studentTotal += float32(singleStudentSubjectDetail.Average)
+		studentTotal += singleStudentSubjectDetail.Average
 		// studentTotal += singleStudentSubjectDetail.TotalSecond
 		currentSubject := models.GetSubjectBySubjectClassId(singleStudentSubjectDetail.SubjectClassID)
 		fmt.Println("The name of the subject is", currentSubject.Name)
@@ -1266,6 +1258,9 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 	studentPercentage = math.Round(studentPercentage*10) / 10
 	totalScoreObtainable := numberOfSubjectOffered * 100
 
+	// studentTotal = math.Round(float64(studentTotal)*100) / 100
+	// average := math.Round(float64(GetSessionAverage(*singleStudentSubjectDetail))*100) / 100
+
 	principalRemarks := GetPrincipalRemarkFromPercentage(studentPercentage)
 	teacherRemarks := GetTeacherRemarkFromPercentage(studentPercentage)
 
@@ -1278,7 +1273,7 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		SubjectScoreDetails:         StudentSubjectScoreDetails,
 		TotalObtainable:             totalScoreObtainable,
 		StudentPercentage:           studentPercentage,
-		StudentTotalScore:           studentTotal,
+		StudentTotalScore:           math.Round(studentTotal*100) / 100,
 		PrincipalRemarks:            principalRemarks,
 		TeacherRemarks:              teacherRemarks,
 		OverallRemarkFromPercentage: GetRemarkFromScore(studentPercentage),
