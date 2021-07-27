@@ -1200,6 +1200,7 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		OverallGradeFromPercentage  string
 		DidFirstTerm                bool
 		DidSecondTerm               bool
+		TotalNumberOfSubject        int // This is to help with display 13 subjects shows on 2 pages
 	}
 
 	GetSubjectListRow := models.GetStudentSubjectListRowByStudentID(uint(id))
@@ -1226,12 +1227,6 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		remark := GetRemarkFromScore(float64(average))
 		updatedStudentSubjectClass := models.UpdateStudentSubject(singleStudentSubjectDetail.ID, totalScore, grade, remark, average)
 		fmt.Println(updatedStudentSubjectClass)
-
-		// TODO: Test logic with null values in the database
-		if singleStudentSubjectDetail.TotalFirst > 0 {
-			fmt.Println("fhfh")
-		}
-
 	}
 
 	didFirstTerm := DidFirstTerm(studentSubjectClass)
@@ -1290,6 +1285,7 @@ func ViewSingleStudentResultHandler(w http.ResponseWriter, r *http.Request) {
 		OverallGradeFromPercentage:  GetGradeFromScore(studentPercentage),
 		DidFirstTerm:                didFirstTerm,
 		DidSecondTerm:               didSecondTerm,
+		TotalNumberOfSubject:        numberOfSubjectOffered,
 	}
 
 	// files := []string{
