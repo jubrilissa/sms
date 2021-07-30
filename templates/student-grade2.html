@@ -109,6 +109,7 @@
                   </tr> */}}
                   {{$DidFirstTerm := .DidFirstTerm}}
                   {{ $DidSecondTerm := .DidSecondTerm}}
+                  {{ $DepartmentConvertStudent := .Student.Name}}
                   <tr>
                         <th scope="col">SUBJECTS</th>
                         <th scope="col">FIRST CA</th>
@@ -145,7 +146,13 @@
                     {{ end }}
                     {{ end }}
                     {{ if $DidSecondTerm}}
+                    {{ if and (eq $DepartmentConvertStudent "AJIBOYE DESMOND NIFEMI") (eq .Subject.Name  "PHYSICS")}}
+                    <td>-</td>
+                    {{ else if and (eq $DepartmentConvertStudent "AJIBOYE DESMOND NIFEMI") (eq .Subject.Name  "CHEMISTRY")}}
+                    <td>-</td>
+                    {{ else }} 
                     <td>{{.StudentSubjectClass.TotalSecond}}</td>
+                    {{ end }}
                     {{ end }}
                     <td>{{.StudentSubjectClass.Average}}</td>
                     <td>{{.StudentSubjectClass.GradeThird}}</td>
